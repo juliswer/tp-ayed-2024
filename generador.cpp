@@ -41,7 +41,7 @@ bool verificar_saldo(string username,int monto);
 
 
 /*
-array duplicarArray(Usuario usuarios[], int n){
+funcion duplicarArray(Usuario usuarios[], int n){
     Usuario nuevoArray[n*2];
     for(int i=0; i<n; i++){
         nuevoArray[i] = usuarios[i];
