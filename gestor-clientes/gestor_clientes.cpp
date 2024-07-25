@@ -1,8 +1,8 @@
 #include <iostream>
 using namespace std;
 
-int main() {
-    cout << "Hello world -- Gestor" << endl;
-    
+int main()
+{
+    cout << "Hola mundo";
     return 0;
 }
