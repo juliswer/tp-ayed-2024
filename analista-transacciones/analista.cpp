@@ -9,7 +9,7 @@ El banco debe poder gestionar las transacciones que realizan los clientes. Cada 
 
 En el sistema debo poder:
 
-1. Listar las transacciones de un cliente ordenadas por fecha con paginas de a 5 transacciones mostrando id, fecha y monto.
+1. Listar las transacciones de un cliente ordenadas por fecha con paginas de a 5 transacciones mostrando id, fecha y monto. [LISTO]
 2. Listar la cantidad de ingresos y egresos por mes de un cliente. (POR MES, NO SOLO POR MES VIGENTE)
 3. Mostrar el username del cliente, la fecha y monto de la transacción de monto máximo de todos los clientes.
 4. Mostrar el cliente que más ingresos tuvo en los últimos 30 días.
@@ -50,44 +50,137 @@ struct UserConTransacciones {
     Transaccion ts[MAXIMO_TRANSACCIONES_PERMITIDAS];
 };
 
+void ciclar_transaccion(UserConTransacciones us, Transaccion t);
 void guardar_user_con_transacciones(UserConTransacciones us); // ! JULIAN - listo
 void leer_user_con_transacciones(UserConTransacciones us[], int& len); // ! JULIAN - listo
 void ordenar_transacciones(UserConTransacciones us); // ! JULIAN -- listo
-void listar_transacciones(UserConTransacciones& us); // ! JULIAN
+void listar_transacciones(UserConTransacciones& us); // ! JULIAN -- listo
 TransaccionesEnMes listar_ingresos_egresos_cliente(UserConTransacciones us); // * JULIAN Y THIAGO
 void listar_transacciones_mas_altas_clientes(UserConTransacciones us[], int len); // ? THIAGO
 bool fue_ultimos_30_dias(int fecha); // ? THIAGO
 UserConTransacciones mostrar_clientes_mas_ingresos(UserConTransacciones us[], int len); // ? THIAGO
 
 int main() {
-    cout << "Hello world -- Analista" << endl;
-
     UserConTransacciones us;
-    us.ts[0] = {1, 10, 20240726, true};
-    us.ts[1] = {2, 20, 20240725, false};
-    us.ts[2] = {3, 30, 20240724, true};
-    us.ts[3] = {4, 40, 20240723, false};
-    us.ts[4] = {5, 50, 20240722, true};
-    us.ts[5] = {6, 60, 20240721, false};
-    us.ts[6] = {7, 70, 20240720, true};
-    us.ts[7] = {8, 80, 20240719, false};
-    us.ts[8] = {9, 90, 20240718, true};
-    us.ts[9] = {10, 100, 20240717, false};
-    us.ts[10] = {11, 110, 20240716, true};
-    us.ts[11] = {12, 120, 20240715, false};
-    us.ts[12] = {13, 130, 20240714, true};
-    us.ts[13] = {14, 140, 20240713, false};
-    us.ts[14] = {15, 150, 20240712, true};
-    us.ts[15] = {16, 160, 20240711, false};
-    us.ts[16] = {17, 170, 20240710, true};
-    us.ts[17] = {18, 180, 20240709, false};
-    us.ts[18] = {19, 190, 20240708, true};
-    us.ts[19] = {20, 200, 20240707, false};
-    us.ts[20] = {21, 210, 20240706, true};
+    us.ts[0].id = 1;
+    us.ts[0].monto = 10;
+    us.ts[0].fecha = 20240726;
+    us.ts[0].esEgreso = true;
+
+    us.ts[1].id = 2;
+    us.ts[1].monto = 20;
+    us.ts[1].fecha = 20240725;
+    us.ts[1].esEgreso = false;
+
+    us.ts[2].id = 3;
+    us.ts[2].monto = 30;
+    us.ts[2].fecha = 20240724;
+    us.ts[2].esEgreso = true;
+
+    us.ts[3].id = 4;
+    us.ts[3].monto = 40;
+    us.ts[3].fecha = 20240723;
+    us.ts[3].esEgreso = false;
+
+    us.ts[4].id = 5;
+    us.ts[4].monto = 50;
+    us.ts[4].fecha = 20240722;
+    us.ts[4].esEgreso = true;
+
+    us.ts[5].id = 6;
+    us.ts[5].monto = 60;
+    us.ts[5].fecha = 20240721;
+    us.ts[5].esEgreso = false;
+
+    us.ts[6].id = 7;
+    us.ts[6].monto = 70;
+    us.ts[6].fecha = 20240720;
+    us.ts[6].esEgreso = true;
+
+    us.ts[7].id = 8;
+    us.ts[7].monto = 80;
+    us.ts[7].fecha = 20240719;
+    us.ts[7].esEgreso = false;
+
+    us.ts[8].id = 9;
+    us.ts[8].monto = 90;
+    us.ts[8].fecha = 20240718;
+    us.ts[8].esEgreso = true;
+
+    us.ts[9].id = 10;
+    us.ts[9].monto = 100;
+    us.ts[9].fecha = 20240717;
+    us.ts[9].esEgreso = false;
+
+    us.ts[10].id = 11;
+    us.ts[10].monto = 110;
+    us.ts[10].fecha = 20240716;
+    us.ts[10].esEgreso = true;
+
+    us.ts[11].id = 12;
+    us.ts[11].monto = 120;
+    us.ts[11].fecha = 20240715;
+    us.ts[11].esEgreso = false;
+
+    us.ts[12].id = 13;
+    us.ts[12].monto = 130;
+    us.ts[12].fecha = 20240714;
+    us.ts[12].esEgreso = true;
+
+    us.ts[13].id = 14;
+    us.ts[13].monto = 140;
+    us.ts[13].fecha = 20240713;
+    us.ts[13].esEgreso = false;
+
+    us.ts[14].id = 15;
+    us.ts[14].monto = 150;
+    us.ts[14].fecha = 20240712;
+    us.ts[14].esEgreso = true;
+
+    us.ts[15].id = 16;
+    us.ts[15].monto = 160;
+    us.ts[15].fecha = 20240711;
+    us.ts[15].esEgreso = false;
+
+    us.ts[16].id = 17;
+    us.ts[16].monto = 170;
+    us.ts[16].fecha = 20240710;
+    us.ts[16].esEgreso = true;
+
+    us.ts[17].id = 18;
+    us.ts[17].monto = 180;
+    us.ts[17].fecha = 20240709;
+    us.ts[17].esEgreso = false;
+
+    // us.ts[18].id = 19;
+    // us.ts[18].monto = 190;
+    // us.ts[18].fecha = 20240708;
+    // us.ts[18].esEgreso = true;
+
+    // us.ts[19].id = 20;
+    // us.ts[19].monto = 200;
+    // us.ts[19].fecha = 20240707;
+    // us.ts[19].esEgreso = false;
 
     listar_transacciones(us);
 
     return 0;
+}
+
+TransaccionesEnMes listar_ingresos_egresos_cliente(UserConTransacciones us) {
+    
+}
+
+void ciclar_transaccion(UserConTransacciones us, Transaccion t) {
+    int transacciones_len = sizeof(us.ts) / sizeof(us.ts[0]);
+
+    for(int i = 1; i < transacciones_len; i++) {
+        us.ts[i - 1] = us.ts[i];
+    }
+
+    us.ts[transacciones_len - 1] = t;
+
+    guardar_user_con_transacciones(us);
 }
 
 void leer_user_con_transacciones(UserConTransacciones us[], int& len) {
@@ -133,14 +226,16 @@ void ordenar_transacciones(UserConTransacciones us) {
 
 
 void listar_transacciones(UserConTransacciones& us) {
-    cout << "LISTANDO";
     ordenar_transacciones(us);
     int pagina = 1;
     int transacciones_len = sizeof(us.ts) / sizeof(us.ts[0]);
     int transacciones_por_pagina = 5;
 
     for (int i = 0; i < transacciones_len; i += transacciones_por_pagina) {
-        cout << "ESTA ES LA PAGINA: " << pagina << endl;
+        if(i == 0) {
+            cout << "-----------------------" << endl;
+        }
+        cout << "ESTA ES LA PAGINA: " << pagina << endl << endl;
 
         for (int j = i; j < i + transacciones_por_pagina && j < transacciones_len; ++j) {
             cout << "Id de Transaccion: " << us.ts[j].id << endl;
