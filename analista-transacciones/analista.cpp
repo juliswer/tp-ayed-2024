@@ -19,6 +19,11 @@ En el sistema debo poder:
 // TODO: Agregar manejo de transacciones llenas
 const int MAXIMO_TRANSACCIONES_PERMITIDAS = 20;
 
+struct ContabilizarIngresosCliente {
+    string username;
+    float cantidad;
+};
+
 struct Mes {
     int cantidad;
 };
@@ -50,18 +55,20 @@ struct UserConTransacciones {
     Transaccion ts[MAXIMO_TRANSACCIONES_PERMITIDAS];
 };
 
-void ciclar_transaccion(UserConTransacciones us, Transaccion t);
+void ciclar_transaccion(UserConTransacciones us, Transaccion t); // ! listo
 void guardar_user_con_transacciones(UserConTransacciones us); // ! JULIAN - listo
 void leer_user_con_transacciones(UserConTransacciones us[], int& len); // ! JULIAN - listo
 void ordenar_transacciones(UserConTransacciones us); // ! JULIAN -- listo
 void listar_transacciones(UserConTransacciones& us); // ! JULIAN -- listo
+Transaccion dame_transaccion_mas_cara(Transaccion t[], int len); // * Julian Y THIAGO -- listo
 TransaccionesEnMes listar_ingresos_egresos_cliente(UserConTransacciones us); // * JULIAN Y THIAGO
-void listar_transacciones_mas_altas_clientes(UserConTransacciones us[], int len); // ? THIAGO
-bool fue_ultimos_30_dias(int fecha); // ? THIAGO
+void listar_transacciones_mas_altas_clientes(UserConTransacciones us[], int len); // ? THIAGO -- listo
+bool fue_ultimos_30_dias(int fecha); // ? THIAGO -- listo
 UserConTransacciones mostrar_clientes_mas_ingresos(UserConTransacciones us[], int len); // ? THIAGO
 
 int main() {
     UserConTransacciones us;
+    us.username = "Mengano";
     us.ts[0].id = 1;
     us.ts[0].monto = 10;
     us.ts[0].fecha = 20240726;
@@ -73,96 +80,32 @@ int main() {
     us.ts[1].esEgreso = false;
 
     us.ts[2].id = 3;
-    us.ts[2].monto = 30;
+    us.ts[2].monto = 9000;
     us.ts[2].fecha = 20240724;
     us.ts[2].esEgreso = true;
 
-    us.ts[3].id = 4;
-    us.ts[3].monto = 40;
-    us.ts[3].fecha = 20240723;
-    us.ts[3].esEgreso = false;
+    UserConTransacciones us2;
+    us2.username = "Pepito";
+    us2.ts[0].id = 1;
+    us2.ts[0].monto = 500000;
+    us2.ts[0].fecha = 20240726;
+    us2.ts[0].esEgreso = true;
 
-    us.ts[4].id = 5;
-    us.ts[4].monto = 50;
-    us.ts[4].fecha = 20240722;
-    us.ts[4].esEgreso = true;
+    us2.ts[1].id = 2;
+    us2.ts[1].monto = 20;
+    us2.ts[1].fecha = 20240725;
+    us2.ts[1].esEgreso = false;
 
-    us.ts[5].id = 6;
-    us.ts[5].monto = 60;
-    us.ts[5].fecha = 20240721;
-    us.ts[5].esEgreso = false;
+    us2.ts[2].id = 3;
+    us2.ts[2].monto = 30;
+    us2.ts[2].fecha = 20240724;
+    us2.ts[2].esEgreso = true;
 
-    us.ts[6].id = 7;
-    us.ts[6].monto = 70;
-    us.ts[6].fecha = 20240720;
-    us.ts[6].esEgreso = true;
+    UserConTransacciones usuarios[2];
+    usuarios[0] = us;
+    usuarios[1] = us2;
 
-    us.ts[7].id = 8;
-    us.ts[7].monto = 80;
-    us.ts[7].fecha = 20240719;
-    us.ts[7].esEgreso = false;
-
-    us.ts[8].id = 9;
-    us.ts[8].monto = 90;
-    us.ts[8].fecha = 20240718;
-    us.ts[8].esEgreso = true;
-
-    us.ts[9].id = 10;
-    us.ts[9].monto = 100;
-    us.ts[9].fecha = 20240717;
-    us.ts[9].esEgreso = false;
-
-    us.ts[10].id = 11;
-    us.ts[10].monto = 110;
-    us.ts[10].fecha = 20240716;
-    us.ts[10].esEgreso = true;
-
-    us.ts[11].id = 12;
-    us.ts[11].monto = 120;
-    us.ts[11].fecha = 20240715;
-    us.ts[11].esEgreso = false;
-
-    us.ts[12].id = 13;
-    us.ts[12].monto = 130;
-    us.ts[12].fecha = 20240714;
-    us.ts[12].esEgreso = true;
-
-    us.ts[13].id = 14;
-    us.ts[13].monto = 140;
-    us.ts[13].fecha = 20240713;
-    us.ts[13].esEgreso = false;
-
-    us.ts[14].id = 15;
-    us.ts[14].monto = 150;
-    us.ts[14].fecha = 20240712;
-    us.ts[14].esEgreso = true;
-
-    us.ts[15].id = 16;
-    us.ts[15].monto = 160;
-    us.ts[15].fecha = 20240711;
-    us.ts[15].esEgreso = false;
-
-    us.ts[16].id = 17;
-    us.ts[16].monto = 170;
-    us.ts[16].fecha = 20240710;
-    us.ts[16].esEgreso = true;
-
-    us.ts[17].id = 18;
-    us.ts[17].monto = 180;
-    us.ts[17].fecha = 20240709;
-    us.ts[17].esEgreso = false;
-
-    // us.ts[18].id = 19;
-    // us.ts[18].monto = 190;
-    // us.ts[18].fecha = 20240708;
-    // us.ts[18].esEgreso = true;
-
-    // us.ts[19].id = 20;
-    // us.ts[19].monto = 200;
-    // us.ts[19].fecha = 20240707;
-    // us.ts[19].esEgreso = false;
-
-    listar_transacciones(us);
+    listar_transacciones_mas_altas_clientes(usuarios, 2);
 
     return 0;
 }
@@ -247,4 +190,62 @@ void listar_transacciones(UserConTransacciones& us) {
         pagina++;
         cout << "-----------------------" << endl;
     }
+}
+
+void listar_transacciones_mas_altas_clientes(UserConTransacciones us[], int len) {
+    for(int i = 0; i < len; ++i) {
+        cout << "EL USERNAME: " << us[i].username << endl;
+        int transferenciaLen = sizeof(us[i].ts) / sizeof(us[i].ts[0]);
+
+        Transaccion mas_cara = dame_transaccion_mas_cara(us[i].ts, transferenciaLen);
+
+        cout << "La mas cara de " << us[i].username << " " <<  "es de: " << mas_cara.monto << " y tiene fecha de: " << mas_cara.fecha << endl;
+    }
+}
+
+Transaccion dame_transaccion_mas_cara(Transaccion t[], int len) {
+    Transaccion mas_cara = t[0];
+    
+    for(int i = 1; i < len; i++)  {
+        if(t[i].monto > mas_cara.monto) {
+            mas_cara = t[i];
+        }
+    }
+
+    return mas_cara;
+}
+
+bool fue_ultimos_30_dias(int fecha) {
+    int fecha_actual = 20240812;
+    
+    int anio_actual = fecha_actual / 10000;
+    int mes_actual = (fecha_actual / 100) % 100;
+    int dia_actual = fecha_actual % 100;
+
+    int anio_fecha = fecha / 10000;
+    int mes_fecha = (fecha / 100) % 100;
+    int dia_fecha = fecha % 100;
+
+    int dias_actual = anio_actual * 365 + mes_actual * 30 + dia_actual;
+    int dias_fecha = anio_fecha * 365 + mes_fecha * 30 + dia_fecha;
+
+    int diferencia_dias = dias_actual - dias_fecha;
+
+    return diferencia_dias <= 30 && diferencia_dias >= 0;
+}
+
+UserConTransacciones mostrar_clientes_mas_ingresos(UserConTransacciones us[], int len) {
+    ContabilizarIngresosCliente ingresos_clientes[len];
+
+    for(int i = 0; i < len; i++) {
+        ingresos_clientes[i].username = us[i].username;
+        int transferenciaLen = sizeof(us[i].ts) / sizeof(us[i].ts[0]);
+        for(int j = 0; j < transferenciaLen; j++) {
+            if(fue_ultimos_30_dias(us[i].ts[j].fecha) && !us[i].ts[j].esEgreso) {
+                ingresos_clientes[i].cantidad += us[i].ts[j].monto;
+            }
+        }
+    }
+
+    // obtener el usuario que tenga el ingreso mas alto;
 }
