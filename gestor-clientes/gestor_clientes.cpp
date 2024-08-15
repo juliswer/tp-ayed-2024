@@ -7,7 +7,7 @@ struct Cliente
     string Dni;
     string Username;
     string Clave;
-    int Saldo;
+    double Saldo;
 };
 
 const int clientesMax = 100;
@@ -49,6 +49,8 @@ void registrarCliente()
     clientes[numClientes++] = clienteNuevo;
 
     cout << "Se registro existosamente." << endl;
+
+    return;
 }
 
 void guardarCliente()
@@ -94,8 +96,13 @@ int main()
         cout << "1. Registrar Cliente" << endl;
         cout << "2. Salir" << endl;
         cout << "Seleccione una opcion" << endl;
-        cin >> opcion;
-
+        if (!(cin >> opcion))
+        {
+            cout << "La opcion que ingresaste fue invalida. Por favor ingrese una opcion valida." << endl;
+            cin.clear();              // sale del estado de error del cin.
+            cin.ignore(100000, '\n'); // elimina lo que se escribio en el cin.
+            continue;
+        }
         switch (opcion)
         {
         case 1:
