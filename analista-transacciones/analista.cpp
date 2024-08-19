@@ -16,8 +16,7 @@ En el sistema debo poder:
 
 */
 
-// TODO: Agregar manejo de transacciones llenas
-const int MAXIMO_TRANSACCIONES_PERMITIDAS = 20;
+const int MAXIMO_TRANSACCIONES_PERMITIDAS = 3;
 
 struct ContabilizarIngresosCliente {
     string username;
@@ -25,7 +24,8 @@ struct ContabilizarIngresosCliente {
 };
 
 struct Mes {
-    int cantidad;
+    int ingresos;
+    int egresos;
 };
 
 struct TransaccionesEnMes {
@@ -60,11 +60,13 @@ void guardar_user_con_transacciones(UserConTransacciones us); // ! JULIAN - list
 void leer_user_con_transacciones(UserConTransacciones us[], int& len); // ! JULIAN - listo
 void ordenar_transacciones(UserConTransacciones us); // ! JULIAN -- listo
 void listar_transacciones(UserConTransacciones& us); // ! JULIAN -- listo
+UserConTransacciones encontrar_cliente_por_username(string username, UserConTransacciones us[], int len); // ! JULIAN -- listo
 Transaccion dame_transaccion_mas_cara(Transaccion t[], int len); // * Julian Y THIAGO -- listo
-TransaccionesEnMes listar_ingresos_egresos_cliente(UserConTransacciones us); // * JULIAN Y THIAGO
+int obtener_mes_fecha(int fecha); // ! JULIAN -- listo
+TransaccionesEnMes listar_ingresos_egresos_cliente(UserConTransacciones us); // * JULIAN Y THIAGO -- listo
 void listar_transacciones_mas_altas_clientes(UserConTransacciones us[], int len); // ? THIAGO -- listo
 bool fue_ultimos_30_dias(int fecha); // ? THIAGO -- listo
-UserConTransacciones mostrar_clientes_mas_ingresos(UserConTransacciones us[], int len); // ? THIAGO
+ContabilizarIngresosCliente mostrar_cliente_mas_ingresos(UserConTransacciones us[], int len); // ? THIAGO -- listo
 
 int main() {
     UserConTransacciones us;
@@ -75,7 +77,7 @@ int main() {
     us.ts[0].esEgreso = true;
 
     us.ts[1].id = 2;
-    us.ts[1].monto = 20;
+    us.ts[1].monto = 40;
     us.ts[1].fecha = 20240725;
     us.ts[1].esEgreso = false;
 
@@ -92,7 +94,7 @@ int main() {
     us2.ts[0].esEgreso = true;
 
     us2.ts[1].id = 2;
-    us2.ts[1].monto = 20;
+    us2.ts[1].monto = 200;
     us2.ts[1].fecha = 20240725;
     us2.ts[1].esEgreso = false;
 
@@ -105,13 +107,127 @@ int main() {
     usuarios[0] = us;
     usuarios[1] = us2;
 
-    listar_transacciones_mas_altas_clientes(usuarios, 2);
+    TransaccionesEnMes transacciones = listar_ingresos_egresos_cliente(usuarios[0]);
+
+    cout << "Julio: " << transacciones.julio.egresos << endl;
 
     return 0;
 }
 
+int obtener_mes_fecha(int fecha) {
+    int mmdd = fecha % 10000;
+    int mes = mmdd / 100;
+
+    return mes;
+}
+
 TransaccionesEnMes listar_ingresos_egresos_cliente(UserConTransacciones us) {
+    // vamos a suponer que solo hay transacciones anuales (o sea, no hay una en enero 2023 y otra en enero 2024)
+    TransaccionesEnMes transacciones;
+    int transacciones_len = sizeof(us.ts) / sizeof(us.ts[0]);
+
+    for(int i = 0; i < transacciones_len; i++) {
+        switch(obtener_mes_fecha(us.ts[i].fecha)) {
+            case 1: {
+                if(us.ts[i].esEgreso) {
+                    transacciones.enero.egresos += us.ts[i].monto;
+                } else {
+                    transacciones.enero.ingresos += us.ts[i].monto;
+                }
+                break;
+            }
+            case 2: {
+                if(us.ts[i].esEgreso) {
+                    transacciones.febrero.egresos += us.ts[i].monto;
+                } else {
+                    transacciones.febrero.ingresos += us.ts[i].monto;
+                }
+                break;
+            }
+            case 3: {
+                if(us.ts[i].esEgreso) {
+                    transacciones.marzo.egresos += us.ts[i].monto;
+                } else {
+                    transacciones.marzo.ingresos += us.ts[i].monto;
+                }
+                break;
+            }
+            case 4: {
+                if(us.ts[i].esEgreso) {
+                    transacciones.abril.egresos += us.ts[i].monto;
+                } else {
+                    transacciones.abril.ingresos += us.ts[i].monto;
+                }
+                break;
+            }
+            case 5: {
+                if(us.ts[i].esEgreso) {
+                    transacciones.mayo.egresos += us.ts[i].monto;
+                } else {
+                    transacciones.mayo.ingresos += us.ts[i].monto;
+                }
+                break;
+            }
+            case 6: {
+                if(us.ts[i].esEgreso) {
+                    transacciones.junio.egresos += us.ts[i].monto;
+                } else {
+                    transacciones.junio.ingresos += us.ts[i].monto;
+                }
+                break;
+            }
+            case 7: {
+                if(us.ts[i].esEgreso) {
+                    transacciones.julio.egresos += us.ts[i].monto;
+                } else {
+                    transacciones.julio.ingresos += us.ts[i].monto;
+                }
+                break;
+            }
+            case 8: {
+                if(us.ts[i].esEgreso) {
+                    transacciones.agosto.egresos += us.ts[i].monto;
+                } else {
+                    transacciones.agosto.ingresos += us.ts[i].monto;
+                }
+                break;
+            }
+            case 9: {
+                if(us.ts[i].esEgreso) {
+                    transacciones.septiembre.egresos += us.ts[i].monto;
+                } else {
+                    transacciones.septiembre.ingresos += us.ts[i].monto;
+                }
+                break;
+            }
+            case 10: {
+                if(us.ts[i].esEgreso) {
+                    transacciones.octubre.egresos += us.ts[i].monto;
+                } else {
+                    transacciones.octubre.ingresos += us.ts[i].monto;
+                }
+                break;
+            }
+            case 11: {
+                if(us.ts[i].esEgreso) {
+                    transacciones.noviembre.egresos += us.ts[i].monto;
+                } else {
+                    transacciones.noviembre.ingresos += us.ts[i].monto;
+                }
+                break;
+            }
+            case 12: {
+                if(us.ts[i].esEgreso) {
+                    transacciones.diciembre.egresos += us.ts[i].monto;
+                } else {
+                    transacciones.diciembre.ingresos += us.ts[i].monto;
+                }
+                break;
+            }
+        }
+    }
     
+    return transacciones;
 }
 
 void ciclar_transaccion(UserConTransacciones us, Transaccion t) {
@@ -234,18 +350,43 @@ bool fue_ultimos_30_dias(int fecha) {
     return diferencia_dias <= 30 && diferencia_dias >= 0;
 }
 
-UserConTransacciones mostrar_clientes_mas_ingresos(UserConTransacciones us[], int len) {
+UserConTransacciones encontrar_cliente_por_username(string username, UserConTransacciones us[], int len) {
+    int i = 0;
+    
+    while(i < len && us[i].username != username) {
+        i++;
+    }
+
+    if(i == len) {
+        cout << "Usuario no encontrado" << endl;
+    }
+
+    return us[i];
+}
+
+ContabilizarIngresosCliente mostrar_cliente_mas_ingresos(UserConTransacciones us[], int len) {
     ContabilizarIngresosCliente ingresos_clientes[len];
 
     for(int i = 0; i < len; i++) {
         ingresos_clientes[i].username = us[i].username;
         int transferenciaLen = sizeof(us[i].ts) / sizeof(us[i].ts[0]);
-        for(int j = 0; j < transferenciaLen; j++) {
+        for(int j = 0; j < 2; j++) {
+            cout << "FUE ULTIMOS 30 DIAS? " << us[i].username << us[i].ts[j].id << fue_ultimos_30_dias(us[i].ts[j].fecha);
             if(fue_ultimos_30_dias(us[i].ts[j].fecha) && !us[i].ts[j].esEgreso) {
                 ingresos_clientes[i].cantidad += us[i].ts[j].monto;
             }
         }
     }
 
-    // obtener el usuario que tenga el ingreso mas alto;
+    int ingresos_clientes_len = sizeof(ingresos_clientes) / sizeof(ingresos_clientes[0]);
+
+    ContabilizarIngresosCliente cliente_con_mas_ingresos = ingresos_clientes[0];
+
+    for(int i = 0; i < ingresos_clientes_len; i++) {
+        if(ingresos_clientes[i].cantidad > cliente_con_mas_ingresos.cantidad) {
+            cliente_con_mas_ingresos = ingresos_clientes[i];
+        }
+    }
+
+    return cliente_con_mas_ingresos;
 }
