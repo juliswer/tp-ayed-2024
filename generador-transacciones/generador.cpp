@@ -9,7 +9,7 @@ struct Transaccion{
     bool esEgreso;
 };
 
-//hacer funcion que duplica el tamaño array
+
 
 struct Usuario{
     string nombre;
@@ -22,15 +22,15 @@ struct Usuario{
 
 bool validar_usuario(string nombre_usuario, string contraseña, Usuario& usuario);
 
-bool eliminar_transaccion(string username, int id);
+bool eliminar_transaccion(string username, int id);//no esta 
 
 float actualizar_saldo(string username);//deberia hacer que la sumatoria de todos los montos sea positiva
 
 int sumatoria_tansacciones(Usuario usuario);
 
-void realizar_transaccion(string username, int monto, bool esEgreso, int fecha);
+void realizar_transaccion(string username);
 
-Transaccion crear_transaccion(int monto, int fecha, bool esEgreso);
+Transaccion crear_transaccion(int monto, int fecha, bool esEgreso);//falta que asigne el id 
 
 bool verificar_saldo(string username);
 
@@ -41,8 +41,9 @@ Usuario obtener_usuario(string username);
 void agregar_transaccion_archivo(string username,Transaccion transaccion); //insertar ordenado por fecha???????
 
 /*
-array duplicarArray(Usuario usuarios[], int n){
-    Usuario nuevoArray[n*2];
+// funcion que duplica el tamaño array
+array duplicarArray(Usuario usuarios[], int len){
+    Usuario nuevoArray[len*2];
     for(int i=0; i<n; i++){
         nuevoArray[i] = usuarios[i];
     }
@@ -76,7 +77,23 @@ int main() {
     {
         cout << "Que es lo siguiente que desea hacer:\n0.Salir\n1. Realizar Transaccion\n2.Eliminar Transaccion\n * \r" << endl;
         cin >> comando; 
-    } while (comando != '0');
+    }while (comando != '0');
+    switch (comando)
+    {
+    case 1:
+            realizar_transaccion(usuario);
+            actualizar_saldo(usuario);
+        break;
+    
+    case 2:
+
+        break;
+    
+    default:
+
+        break;
+    }
+
     
     return 0;
 }
@@ -126,6 +143,53 @@ Usuario obtener_usuario(string username)
     return {"","","",0,0,0}; 
 }
 
+// ::Funciones::
+
+int obtener_ultimo_id(string username){
+    Usuario user= obtener_usuario(username);
+    //no c como seguir :(
+
+}
+
+Transaccion crear_transaccion(int monto, int fecha, bool esEgreso){
+    
+    Transaccion transaccion;
+    
+    //falta la asignacion del id a la transaccion
+    transaccion.monto=monto;
+    transaccion.fecha=fecha;
+    transaccion.esEgreso=esEgreso;
+    return transaccion; 
+
+}
+void realizar_transaccion(string username){
+
+    int comandotemp;
+    cout << "Que tipo de transaccion quiere realizar:\n0.Salir\n1. Realizar Ingreso\n2.Realizar Egreso\n * \r" << endl;
+    cin >> comandotemp;
+
+    if (comandotemp == 0) {
+        return;
+    }
+
+    bool esEgresotemp = (comandotemp == 2);
+
+    int montotemp;
+    cout << "Ahora ingrese el monto de su transaccion:" << endl;
+    cin >> montotemp;
+
+    if (esEgresotemp && sumatoria_tansacciones(usuario) - montotemp < 0) {
+        cout << "El monto que puso excede a su saldo" << endl;
+        return;
+    }
+
+    int fechatemp;
+    cout << "Ahora ingrese la fecha actual \n con el formato DDMMAAAA ejemplo 11092001" << endl;
+    cin >> fechatemp;
+
+    crear_transaccion(montotemp, fechatemp, esEgresotemp);
+}
+
 
 
 /*
@@ -139,42 +203,65 @@ Actualizar saldo
 */
 /*
 float actualizar_saldo(string username){
-        Usuario user = obtener_usuario(username.0);
+
+        Usuario user = obtener_usuario(username);
+
         if(verificar_saldo(username)){
+
             user.saldo = sumatoria_tansacciones(user) + user.saldo;
             cout<<"Transaccion realizada con exito";
             return user.saldo;
+
         }
+
         else{
+
             cout<<"No se puede realizar esta accion, saldo insuficiente";
             return -1;
+
         }
         
 }//deberia hacer que la sumatoria de todos los montos sea positiva
 */
 /*
 bool verificar_saldo(string username){
+
     Usuario user = obtener_usuario(username,0);
+
         if(sumatoria_tansacciones(user) + user.saldo<0){
+
             return false;
+
         }
+
         if(sumatoria_tansacciones(user) + user.saldo >=0){
+
             return true;
+
         }
+
 }
 
 int sumatoria_tansacciones(Usuario usuario){
+
     int SaldoEstimado=0;
      int ArrLEN = sizeof(user.transacciones)/sizeof(user.transacciones[0]);
+
         for (int i = 0; i < ArrLEN; i++)
         {
             if(user.transacciones[i].esEgreso){
+
                 SaldoEstimado-=user.transacciones[i].monto;
+
             }
+
             if(user.transacciones[i].esEgreso==false){
+
                 SaldoEstimado+=user.transacciones[i].monto;
+
             }
         }
+
         return SaldoTotal;
 }
 */
