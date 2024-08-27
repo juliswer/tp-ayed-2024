@@ -81,8 +81,8 @@ int main() {
     switch (comando)
     {
     case 1:
-            realizar_transaccion(usuario);
-            actualizar_saldo(usuario);
+            realizar_transaccion(usuario.username);
+            actualizar_saldo(usuario.username);
         break;
     
     case 2:
@@ -147,7 +147,8 @@ Usuario obtener_usuario(string username)
 
 int obtener_ultimo_id(string username){
     Usuario user= obtener_usuario(username);
-    //no c como seguir :(
+    //no c como seguir :( 
+    return 0;
 
 }
 
@@ -177,8 +178,9 @@ void realizar_transaccion(string username){
     int montotemp;
     cout << "Ahora ingrese el monto de su transaccion:" << endl;
     cin >> montotemp;
-
-    if (esEgresotemp && sumatoria_tansacciones(usuario) - montotemp < 0) {
+    
+    Usuario user = obtener_usuario(username);
+    if (esEgresotemp && sumatoria_tansacciones(user) - montotemp < 0) {
         cout << "El monto que puso excede a su saldo" << endl;
         return;
     }
@@ -201,7 +203,7 @@ Actualizar saldo
     5. Devolver el saldo actualizado
     sino es suficiente devolver -1
 */
-/*
+
 float actualizar_saldo(string username){
 
         Usuario user = obtener_usuario(username);
@@ -222,11 +224,36 @@ float actualizar_saldo(string username){
         }
         
 }//deberia hacer que la sumatoria de todos los montos sea positiva
-*/
-/*
+
+
+
+int sumatoria_tansacciones(Usuario usuario){
+
+    int SaldoEstimado=0;
+     int ArrLEN = sizeof(usuario.transacciones)/sizeof(usuario.transacciones[0]);
+
+        for (int i = 0; i < ArrLEN; i++)
+        {
+            if(usuario.transacciones[i].esEgreso){
+
+                SaldoEstimado-=usuario.transacciones[i].monto;
+
+            }
+
+            if(usuario.transacciones[i].esEgreso==false){
+
+                SaldoEstimado+=usuario.transacciones[i].monto;
+
+            }
+        }
+
+        return SaldoEstimado;
+}
+
+
 bool verificar_saldo(string username){
 
-    Usuario user = obtener_usuario(username,0);
+    Usuario user = obtener_usuario(username);
 
         if(sumatoria_tansacciones(user) + user.saldo<0){
 
@@ -239,29 +266,7 @@ bool verificar_saldo(string username){
             return true;
 
         }
+    
+    else return false;
 
 }
-
-int sumatoria_tansacciones(Usuario usuario){
-
-    int SaldoEstimado=0;
-     int ArrLEN = sizeof(user.transacciones)/sizeof(user.transacciones[0]);
-
-        for (int i = 0; i < ArrLEN; i++)
-        {
-            if(user.transacciones[i].esEgreso){
-
-                SaldoEstimado-=user.transacciones[i].monto;
-
-            }
-
-            if(user.transacciones[i].esEgreso==false){
-
-                SaldoEstimado+=user.transacciones[i].monto;
-
-            }
-        }
-
-        return SaldoTotal;
-}
-*/
