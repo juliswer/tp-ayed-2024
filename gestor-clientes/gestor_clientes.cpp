@@ -101,7 +101,6 @@ int main()
             cout << "La opcion que ingresaste fue invalida. Por favor ingrese una opcion valida." << endl;
             cin.clear();              // sale del estado de error del cin.
             cin.ignore(100000, '\n'); // elimina lo que se escribio en el cin.
-            continue;
         }
         switch (opcion)
         {

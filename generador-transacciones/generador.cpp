@@ -1,8 +1,9 @@
 #include <iostream>
 using namespace std;
 
-const int MAXIMO_TRANSACCIONES_PERMITIDAS = 20;
+
 struct Transaccion{
+    int dni;
     int id;
     float monto;
     int fecha;
@@ -10,15 +11,14 @@ struct Transaccion{
 };
 
 
-
-struct Usuario{
-    string nombre;
-    string username;
-    string password;
+struct Usuario {
+    char nombre[20];
+    char username[20];
+    char password[20];
     int dni;
     float saldo;    
-    Transaccion transacciones[MAXIMO_TRANSACCIONES_PERMITIDAS];
 };
+
 
 bool validar_usuario(string nombre_usuario, string contraseña, Usuario& usuario);
 
@@ -74,25 +74,27 @@ int main() {
 
     cout << "Su saldo es: " << usuario.saldo << endl; 
 
-    {
+    do {
         cout << "Que es lo siguiente que desea hacer:\n0.Salir\n1. Realizar Transaccion\n2.Eliminar Transaccion\n * \r" << endl;
-        cin >> comando; 
+        cin >> comando;
+
+        switch (comando)
+        {
+            case '1':
+                realizar_transaccion(usuario.username);
+                actualizar_saldo(usuario.username);
+                break;
+            
+            case '2':
+
+                break;
+        
+            default:
+
+                break;
+        } 
     }while (comando != '0');
-    switch (comando)
-    {
-    case 1:
-            realizar_transaccion(usuario.username);
-            actualizar_saldo(usuario.username);
-        break;
-    
-    case 2:
 
-        break;
-    
-    default:
-
-        break;
-    }
 
     
     return 0;
@@ -139,12 +141,12 @@ Usuario obtener_usuario(string username)
         }
     }
     fclose(file);
-    
-    return {"","","",0,0,0}; 
+
+    return {"", "", "", 0, 0.0f}; 
 }
 
 // ::Funciones::
-
+//va tener que estar relacionado con como agarramos las transacciones
 int obtener_ultimo_id(string username){
     Usuario user= obtener_usuario(username);
     //no c como seguir :( 
@@ -157,9 +159,9 @@ Transaccion crear_transaccion(int monto, int fecha, bool esEgreso){
     Transaccion transaccion;
     
     //falta la asignacion del id a la transaccion
-    transaccion.monto=monto;
-    transaccion.fecha=fecha;
-    transaccion.esEgreso=esEgreso;
+    transaccion.monto = monto;
+    transaccion.fecha = fecha;
+    transaccion.esEgreso = esEgreso;
     return transaccion; 
 
 }
@@ -226,28 +228,24 @@ float actualizar_saldo(string username){
 }//deberia hacer que la sumatoria de todos los montos sea positiva
 
 
+//cambiar como tomar las transacciones 
 
 int sumatoria_tansacciones(Usuario usuario){
 
     int SaldoEstimado=0;
-     int ArrLEN = sizeof(usuario.transacciones)/sizeof(usuario.transacciones[0]);
+    int ArrLEN = sizeof(usuario.transacciones)/sizeof(usuario.transacciones[0]);
 
-        for (int i = 0; i < ArrLEN; i++)
-        {
-            if(usuario.transacciones[i].esEgreso){
+    for (int i = 0; i < ArrLEN; i++)
+    {
+        if(usuario.transacciones[i].esEgreso)
+            SaldoEstimado-=usuario.transacciones[i].monto;
+        
+        if(usuario.transacciones[i].esEgreso==false)
+            SaldoEstimado+=usuario.transacciones[i].monto;
 
-                SaldoEstimado-=usuario.transacciones[i].monto;
+    }
 
-            }
-
-            if(usuario.transacciones[i].esEgreso==false){
-
-                SaldoEstimado+=usuario.transacciones[i].monto;
-
-            }
-        }
-
-        return SaldoEstimado;
+    return SaldoEstimado;
 }
 
 

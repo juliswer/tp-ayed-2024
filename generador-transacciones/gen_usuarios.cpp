@@ -16,8 +16,7 @@ struct Usuario{
     string username;
     string password;
     int dni;
-    float saldo;    
-    Transaccion transacciones[20];
+    float saldo;
 };
 
 
@@ -32,10 +31,6 @@ int main()
         "a",
         11,
         123,
-        {        
-            {0, 12, 123123123, 1},
-            {1, 43, 12355345, 0}
-        }
     };
     fwrite(&usuario, sizeof(usuario), 1, file);
     fclose(file);
