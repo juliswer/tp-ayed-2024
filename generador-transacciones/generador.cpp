@@ -31,6 +31,7 @@ int sumatoria_tansacciones(Usuario usuario);
 void realizar_transaccion(string username);
 
 Transaccion crear_transaccion(int monto, int fecha, bool esEgreso);//falta que asigne el id 
+int obtener_transacciones_usuario(int dni);
 
 bool verificar_saldo(string username);
 
@@ -145,26 +146,82 @@ Usuario obtener_usuario(string username)
     return {"", "", "", 0, 0.0f}; 
 }
 
+
+
+
+int obtener_transaccion_id(){
+    FILE* file = fopen("transacciones.bin", "rb");
+    Transaccion transaccion;
+    int contador = 0;
+    if (file == 0)
+    {
+        cout << "Ha ocurrido un error grave a la hora de abrir el archivo \nsaliendo del programa..." << std::endl;
+        exit(1);
+    }
+
+    while (fread(&transaccion, sizeof(transaccion), 1, file))
+    {
+        if(transaccion.id>contador )
+        {
+            contador=transaccion.id;
+        }
+    }
+
+     
+    fclose(file);
+    return contador++;
+    
+
+}
+
+
 // ::Funciones::
 //va tener que estar relacionado con como agarramos las transacciones
-int obtener_ultimo_id(string username){
+/*int obtener_ultimo_id(string username){
     Usuario user= obtener_usuario(username);
     //no c como seguir :( 
     return 0;
 
-}
+}*/
 
-Transaccion crear_transaccion(int monto, int fecha, bool esEgreso){
+Transaccion crear_transaccion(int dni,int monto, int fecha, bool esEgreso){
     
     Transaccion transaccion;
-    
-    //falta la asignacion del id a la transaccion
+    transaccion.dni = dni;
+    transaccion.id = obtener_transaccion_id();
     transaccion.monto = monto;
     transaccion.fecha = fecha;
     transaccion.esEgreso = esEgreso;
+
+    //op a
+/*
+    FILE* file = fopen("transacciones.bin", "ab+");
+    if (file == 0)
+    {
+        cout << "Ha ocurrido un error grave a la hora de cargar la transferencia al sistema \nsaliendo del programa..." << std::endl;
+        exit(1);
+    }
+
+    fwrite(&transaccion, sizeof(Transaccion), 1, file);
+     
+    fclose(file);
+    
+    cout << "Transaccion agregada correctamente.\n" << std::endl;
+
+
+
+*/
+
     return transaccion; 
 
 }
+
+
+// 2 opciones 
+// a) en el mismo de crear transaccion agrego la transaccion al archivo
+// b) creo una funcion que reciba la transaccion creada y de ahi lo agregue
+
+
 void realizar_transaccion(string username){
 
     int comandotemp;
@@ -186,12 +243,12 @@ void realizar_transaccion(string username){
         cout << "El monto que puso excede a su saldo" << endl;
         return;
     }
-
+    else{
     int fechatemp;
     cout << "Ahora ingrese la fecha actual \n con el formato DDMMAAAA ejemplo 11092001" << endl;
     cin >> fechatemp;
-
-    crear_transaccion(montotemp, fechatemp, esEgresotemp);
+    crear_transaccion(user.dni,montotemp, fechatemp, esEgresotemp);
+    }
 }
 
 
@@ -210,7 +267,7 @@ float actualizar_saldo(string username){
 
         Usuario user = obtener_usuario(username);
 
-        if(verificar_saldo(username)){
+        if(sumatoria_tansacciones(user) + user.saldo >=0){
 
             user.saldo = sumatoria_tansacciones(user) + user.saldo;
             cout<<"Transaccion realizada con exito";
@@ -230,41 +287,29 @@ float actualizar_saldo(string username){
 
 //cambiar como tomar las transacciones 
 
+
 int sumatoria_tansacciones(Usuario usuario){
 
     int SaldoEstimado=0;
-    int ArrLEN = sizeof(usuario.transacciones)/sizeof(usuario.transacciones[0]);
 
-    for (int i = 0; i < ArrLEN; i++)
+    FILE* file = fopen("transacciones.bin", "rb");
+    Transaccion transaccion;
+    
+    if (file == 0)
     {
-        if(usuario.transacciones[i].esEgreso)
-            SaldoEstimado-=usuario.transacciones[i].monto;
-        
-        if(usuario.transacciones[i].esEgreso==false)
-            SaldoEstimado+=usuario.transacciones[i].monto;
-
+        cout << "Ha ocurrido un error grave a la hora de leer las transacciones \nsaliendo del programa..." << std::endl;
+        exit(1);
     }
 
+    while (fread(&transaccion, sizeof(transaccion), 1, file))
+    {
+       if(transaccion.esEgreso && transaccion.dni == usuario.dni)
+            SaldoEstimado-=transaccion.monto;
+        
+        if(transaccion.esEgreso==false && transaccion.dni == usuario.dni)
+            SaldoEstimado+=transaccione.monto;
+    }
+    fclose(file);
     return SaldoEstimado;
 }
 
-
-bool verificar_saldo(string username){
-
-    Usuario user = obtener_usuario(username);
-
-        if(sumatoria_tansacciones(user) + user.saldo<0){
-
-            return false;
-
-        }
-
-        if(sumatoria_tansacciones(user) + user.saldo >=0){
-
-            return true;
-
-        }
-    
-    else return false;
-
-}
