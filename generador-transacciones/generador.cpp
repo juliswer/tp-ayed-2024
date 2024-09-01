@@ -178,13 +178,13 @@ bool eliminar_transaccion( int id_transaccion){
 
   FILE* file = fopen("transacciones.bin", "rb");
     if (!file) {
-        std::cerr << "No se pudo abrir el archivo para lectura." << std::endl;
+        cout << "No se pudo abrir el archivo para lectura." << endl;
         return;
     }
 
-    FILE* archivoTemporal = fopen("temp.bin", "wb");
+    FILE* archivoTemporal = fopen("transacciones_temp.bin", "wb");
     if (!archivoTemporal) {
-        std::cerr << "No se pudo abrir el archivo temporal para escritura." << std::endl;
+        cout << "No se pudo abrir el archivo temporal para escritura." << endl;
         fclose(file);
         return;
     }
@@ -194,24 +194,51 @@ bool eliminar_transaccion( int id_transaccion){
     // Leer los datos del archivo y escribir los que no se eliminan en el archivo temporal
     while (fread(&transaccion, sizeof(Transaccion), 1, file)) {
         if (transaccion.id != id_transaccion) {
-            fwrite(&dato, sizeof(Dato), 1, archivoTemporal);
+            fwrite(&transaccion, sizeof(Transaccion), 1, archivoTemporal);
         }
     }
 
     fclose(file);
     fclose(archivoTemporal);
-
+    
+    actualizar_archivo_transacciones()
     // Reemplazar el archivo original con el archivo temporal
-   /*  esto funciona si utilizamos 
-    #include <cstdio>
+   /*  esto funciona si utilizamos  #include <cstdio>
     remove("transacciones.bin");
     rename("temp.bin", "transacciones.bin");
     */
 
     //Al no poder reemplazar y eliminar 1 archivo el nuevo "transacciones" seria el 'temp.bin' 
+    
 
+    
 }
 
+void actualizar_archivo_transacciones(){
+    FILE* file = fopen("transacciones.bin", "wb");
+    if (!file) {
+        cout << "No se pudo abrir el archivo para lectura." << endl;
+        return;
+    }
+
+    FILE* archivoTemporal = fopen("transacciones_temp.bin", "rb");
+    if (!archivoTemporal) {
+        cout << "No se pudo abrir el archivo temporal para escritura." << endl;
+        fclose(file);
+        return;
+    }
+    
+    Transaccion transaccion;
+
+    while (fread(&transaccion, sizeof(Transaccion), 1,archivoTemporal)) {
+            fwrite(&transaccion, sizeof(Transaccion), 1, file);
+       
+    }
+
+    fclose(file);
+    fclose(archivoTemporal);
+
+}
 
 
 
