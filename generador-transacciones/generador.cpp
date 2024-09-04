@@ -2,7 +2,8 @@
 using namespace std;
 
 
-struct Transaccion{
+struct Transaccion 
+{
     int dni;
     int id;
     float monto;
@@ -11,20 +12,21 @@ struct Transaccion{
 };
 
 
-struct Usuario {
+struct Usuario 
+{
     char nombre[20];
     char username[20];
     char password[20];
     int dni;
-    float saldo;    
+    float saldo;
 };
 
 
 bool validar_usuario(string nombre_usuario, string contraseña, Usuario& usuario);
 
-bool eliminar_transaccion(string username, int id);//no esta 
+bool eliminar_transaccion(string username, int id); // no esta 
 
-float actualizar_saldo(string username);//deberia hacer que la sumatoria de todos los montos sea positiva
+float actualizar_saldo(string username); // deberia hacer que la sumatoria de todos los montos sea positiva
 
 int sumatoria_tansacciones(Usuario usuario);
 
@@ -32,14 +34,16 @@ void realizar_transaccion(string username);
 
 Transaccion crear_transaccion(int monto, int fecha, bool esEgreso);//falta que asigne el id 
 int obtener_transacciones_usuario(int dni);
+void actualizar_archivo_transacciones();
 
 bool verificar_saldo(string username);
 
-
+// TODO: Guardar esta nueva TX en un archivo 
 
 // Archivos
 Usuario obtener_usuario(string username);
-void agregar_transaccion_archivo(string username,Transaccion transaccion); //insertar ordenado por fecha???????
+void agregar_transaccion_archivo(Transaccion transaccion); //insertar ordenado por fecha???????
+
 
 /*
 // funcion que duplica el tamaño array
@@ -87,14 +91,13 @@ int main() {
                 break;
             
             case '2':
-
+                
                 break;
         
             default:
-
                 break;
-        } 
-    }while (comando != '0');
+        }
+    } while (comando != '0');
 
 
     
@@ -113,6 +116,21 @@ bool validar_usuario(string nombre_usuario, string contraseña, Usuario& usuario
 
 // ::Archivos::
 
+void agregar_transaccion_archivo(Transaccion transaccion)
+{
+    FILE* file = fopen("./data/transacciones.bin", "ab");
+
+    if (file == 0)
+    {
+        cout << "Ha ocurrido un error grave a la hora de abrir el archivo \nsaliendo del programa..." << std::endl;
+        exit(1);
+    }
+
+    fwrite(&transaccion, sizeof(Transaccion), 1, file);
+    fclose(file);
+    return;
+}
+
 /*
 obtener_usuario(string, int) -> Usuario
 
@@ -123,7 +141,7 @@ IMPORTANTE: Si no se puede abrir el archivo devuelve usuario nulo con la variabl
 */
 Usuario obtener_usuario(string username)
 {
-    FILE* file = fopen("usuarios.bin", "rb");
+    FILE* file = fopen("./data/usuarios.bin", "rb");
     Usuario user;
     
 
@@ -149,8 +167,9 @@ Usuario obtener_usuario(string username)
 
 
 
-int obtener_transaccion_id(){
-    FILE* file = fopen("transacciones.bin", "rb");
+int obtener_transaccion_id()
+{
+    FILE* file = fopen("./data/transacciones.bin", "rb");
     Transaccion transaccion;
     int contador = 0;
     if (file == 0)
@@ -170,30 +189,31 @@ int obtener_transaccion_id(){
      
     fclose(file);
     return contador++;
-    
-
 }
 
-bool eliminar_transaccion( int id_transaccion){
-
-  FILE* file = fopen("transacciones.bin", "rb");
+bool eliminar_transaccion( int id_transaccion)
+{
+    FILE* file = fopen("./data/transacciones.bin", "rb");
     if (!file) {
         cout << "No se pudo abrir el archivo para lectura." << endl;
-        return;
+        return false;
     }
 
     FILE* archivoTemporal = fopen("transacciones_temp.bin", "wb");
-    if (!archivoTemporal) {
+    if (!archivoTemporal) 
+    {
         cout << "No se pudo abrir el archivo temporal para escritura." << endl;
         fclose(file);
-        return;
+        return false;
     }
     
     Transaccion transaccion;
 
     // Leer los datos del archivo y escribir los que no se eliminan en el archivo temporal
-    while (fread(&transaccion, sizeof(Transaccion), 1, file)) {
-        if (transaccion.id != id_transaccion) {
+    while (fread(&transaccion, sizeof(Transaccion), 1, file)) 
+    {
+        if (transaccion.id != id_transaccion) 
+        {
             fwrite(&transaccion, sizeof(Transaccion), 1, archivoTemporal);
         }
     }
@@ -201,7 +221,7 @@ bool eliminar_transaccion( int id_transaccion){
     fclose(file);
     fclose(archivoTemporal);
     
-    actualizar_archivo_transacciones()
+    actualizar_archivo_transacciones();
     // Reemplazar el archivo original con el archivo temporal
    /*  esto funciona si utilizamos  #include <cstdio>
     remove("transacciones.bin");
@@ -214,15 +234,18 @@ bool eliminar_transaccion( int id_transaccion){
     
 }
 
-void actualizar_archivo_transacciones(){
-    FILE* file = fopen("transacciones.bin", "wb");
-    if (!file) {
+void actualizar_archivo_transacciones()
+{
+    FILE* file = fopen("./data/transacciones.bin", "wb");
+    if (!file) 
+    {
         cout << "No se pudo abrir el archivo para lectura." << endl;
         return;
     }
 
     FILE* archivoTemporal = fopen("transacciones_temp.bin", "rb");
-    if (!archivoTemporal) {
+    if (!archivoTemporal) 
+    {
         cout << "No se pudo abrir el archivo temporal para escritura." << endl;
         fclose(file);
         return;
@@ -230,9 +253,9 @@ void actualizar_archivo_transacciones(){
     
     Transaccion transaccion;
 
-    while (fread(&transaccion, sizeof(Transaccion), 1,archivoTemporal)) {
-            fwrite(&transaccion, sizeof(Transaccion), 1, file);
-       
+    while (fread(&transaccion, sizeof(Transaccion), 1,archivoTemporal)) 
+    {
+        fwrite(&transaccion, sizeof(Transaccion), 1, file);  
     }
 
     fclose(file);
@@ -290,15 +313,15 @@ Transaccion crear_transaccion(int dni,int monto, int fecha, bool esEgreso){
 // b) creo una funcion que reciba la transaccion creada y de ahi lo agregue
 
 
-void realizar_transaccion(string username){
-
+void realizar_transaccion(string username)
+{
     int comandotemp;
     cout << "Que tipo de transaccion quiere realizar:\n0.Salir\n1. Realizar Ingreso\n2.Realizar Egreso\n * \r" << endl;
     cin >> comandotemp;
 
-    if (comandotemp == 0) {
+    if (comandotemp == 0)
         return;
-    }
+    
 
     bool esEgresotemp = (comandotemp == 2);
 
@@ -307,16 +330,18 @@ void realizar_transaccion(string username){
     cin >> montotemp;
     
     Usuario user = obtener_usuario(username);
-    if (esEgresotemp && sumatoria_tansacciones(user) - montotemp < 0) {
+    if (esEgresotemp && user.saldo + sumatoria_tansacciones(user) - montotemp <= 0) 
+    {
         cout << "El monto que puso excede a su saldo" << endl;
         return;
     }
-    else{
+    
     int fechatemp;
     cout << "Ahora ingrese la fecha actual \n con el formato DDMMAAAA ejemplo 11092001" << endl;
     cin >> fechatemp;
-    crear_transaccion(user.dni,montotemp, fechatemp, esEgresotemp);
-    }
+
+    agregar_transaccion_archivo(crear_transaccion(user.dni,montotemp, fechatemp, esEgresotemp));
+    
 }
 
 
@@ -335,7 +360,8 @@ float actualizar_saldo(string username){
 
         Usuario user = obtener_usuario(username);
 
-        if(sumatoria_tansacciones(user) + user.saldo >=0){
+        if(sumatoria_tansacciones(user) + user.saldo >=0)
+        {
 
             user.saldo = sumatoria_tansacciones(user) + user.saldo;
             cout<<"Transaccion realizada con exito";
@@ -356,11 +382,11 @@ float actualizar_saldo(string username){
 //cambiar como tomar las transacciones 
 
 
-int sumatoria_tansacciones(Usuario usuario){
+int sumatoria_tansacciones(Usuario usuario)
+{
+    int SaldoEstimado = 0;
 
-    int SaldoEstimado=0;
-
-    FILE* file = fopen("transacciones.bin", "rb");
+    FILE* file = fopen("./data/transacciones.bin", "rb");
     Transaccion transaccion;
     
     if (file == 0)
@@ -372,11 +398,12 @@ int sumatoria_tansacciones(Usuario usuario){
     while (fread(&transaccion, sizeof(transaccion), 1, file))
     {
        if(transaccion.esEgreso && transaccion.dni == usuario.dni)
-            SaldoEstimado-=transaccion.monto;
+            SaldoEstimado -= transaccion.monto;
         
         if(transaccion.esEgreso==false && transaccion.dni == usuario.dni)
-            SaldoEstimado+=transaccione.monto;
+            SaldoEstimado += transaccion.monto;
     }
+
     fclose(file);
     return SaldoEstimado;
 }

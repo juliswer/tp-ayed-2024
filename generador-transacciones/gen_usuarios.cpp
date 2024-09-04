@@ -3,36 +3,47 @@ using namespace std;
 
 
 struct Transaccion{
+    int dni;
     int id;
     float monto;
     int fecha;
     bool esEgreso;
 };
 
-//hacer funcion que duplica el tamaño array
 
-struct Usuario{
-    string nombre;
-    string username;
-    string password;
+struct Usuario {
+    char nombre[20];
+    char username[20];
+    char password[20];
     int dni;
-    float saldo;
+    float saldo;    
 };
 
 
 int main()
 {
-    FILE* file = fopen("usuarios.bin", "wb");
+    FILE* file = fopen("./data/usuarios.bin", "wb");
 
-
-    Usuario usuario = {
-        "a",
-        "a",
-        "a",
-        11,
-        123,
+    Usuario user = 
+    {
+        "abc",
+        "dca",
+        "pass",
+        10,
+        23.00f
     };
-    fwrite(&usuario, sizeof(usuario), 1, file);
+    
+    Usuario user2 = 
+    {
+        "a",
+        "a",
+        "a",
+        10,
+        21.00f,
+    };
+
+    fwrite(&user, sizeof(Usuario), 1, file);
+    fwrite(&user2, sizeof(Usuario),1, file);
     fclose(file);
     return 0;
 }
