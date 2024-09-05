@@ -26,11 +26,11 @@ int main()
 
     Usuario user = 
     {
-        "abc",
-        "dca",
-        "pass",
-        10,
-        23.00f
+        "b",
+        "b",
+        "b",
+        1,
+        1000.00f
     };
     
     Usuario user2 = 
@@ -38,8 +38,8 @@ int main()
         "a",
         "a",
         "a",
-        10,
-        21.00f,
+        2,
+        10.00f,
     };
 
     fwrite(&user, sizeof(Usuario), 1, file);

@@ -24,7 +24,7 @@ struct Usuario
 
 bool validar_usuario(string nombre_usuario, string contraseña, Usuario& usuario);
 
-bool eliminar_transaccion(string username, int id); // no esta 
+bool eliminar_transaccion(int id_transaccion);  
 
 float actualizar_saldo(string username); // deberia hacer que la sumatoria de todos los montos sea positiva
 
@@ -43,7 +43,7 @@ bool verificar_saldo(string username);
 // Archivos
 Usuario obtener_usuario(string username);
 void agregar_transaccion_archivo(Transaccion transaccion); //insertar ordenado por fecha???????
-
+int seleccionar_transaccion(Usuario usuario);
 
 /*
 // funcion que duplica el tamaño array
@@ -77,7 +77,7 @@ int main() {
         return 1;
     }
 
-    cout << "Su saldo es: " << usuario.saldo << endl; 
+    cout << "Su saldo es: " << usuario.saldo + sumatoria_tansacciones(usuario) << endl; 
 
     do {
         cout << "Que es lo siguiente que desea hacer:\n0.Salir\n1. Realizar Transaccion\n2.Eliminar Transaccion\n * \r" << endl;
@@ -91,7 +91,7 @@ int main() {
                 break;
             
             case '2':
-                
+                eliminar_transaccion(seleccionar_transaccion(usuario));
                 break;
         
             default:
@@ -102,6 +102,24 @@ int main() {
 
     
     return 0;
+}
+
+int seleccionar_transaccion(Usuario usuario)
+{
+    FILE* file = fopen("./data/transacciones.bin", "rb");
+    Transaccion transaccion_actual;
+    int id;
+
+    while(fread(&transaccion_actual, sizeof(Transaccion), 1, file))
+    {
+        if (usuario.dni == transaccion_actual.dni)
+            cout << "\nID:" << transaccion_actual.id << "\nMonto:" << transaccion_actual.monto << "\nFecha" << transaccion_actual.fecha << "\nEsEgreso:" << transaccion_actual.esEgreso << "\n------------------" << endl;
+    }
+
+    fclose(file);
+    cout << "ID de la transaccion a eliminar: ";
+    cin >> id;
+    return id;
 }
 
 bool validar_usuario(string nombre_usuario, string contraseña, Usuario& usuario)
@@ -180,18 +198,15 @@ int obtener_transaccion_id()
 
     while (fread(&transaccion, sizeof(transaccion), 1, file))
     {
-        if(transaccion.id>contador )
-        {
+        if(transaccion.id > contador )
             contador=transaccion.id;
-        }
     }
 
-     
     fclose(file);
     return contador++;
 }
 
-bool eliminar_transaccion( int id_transaccion)
+bool eliminar_transaccion(int id_transaccion)
 {
     FILE* file = fopen("./data/transacciones.bin", "rb");
     if (!file) {
@@ -229,9 +244,8 @@ bool eliminar_transaccion( int id_transaccion)
     */
 
     //Al no poder reemplazar y eliminar 1 archivo el nuevo "transacciones" seria el 'temp.bin' 
-    
-
-    
+    cout << "Se elimino la transaccion correctamente" << endl; 
+    return true; 
 }
 
 void actualizar_archivo_transacciones()
@@ -283,7 +297,6 @@ Transaccion crear_transaccion(int dni,int monto, int fecha, bool esEgreso){
     transaccion.monto = monto;
     transaccion.fecha = fecha;
     transaccion.esEgreso = esEgreso;
-
     //op a
 /*
     FILE* file = fopen("transacciones.bin", "ab+");
@@ -341,7 +354,6 @@ void realizar_transaccion(string username)
     cin >> fechatemp;
 
     agregar_transaccion_archivo(crear_transaccion(user.dni,montotemp, fechatemp, esEgresotemp));
-    
 }
 
 
@@ -369,11 +381,10 @@ float actualizar_saldo(string username){
 
         }
 
-        else{
-
+        else
+        {
             cout<<"No se puede realizar esta accion, saldo insuficiente";
             return -1;
-
         }
         
 }//deberia hacer que la sumatoria de todos los montos sea positiva
