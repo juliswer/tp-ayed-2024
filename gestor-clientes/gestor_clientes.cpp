@@ -3,10 +3,10 @@ using namespace std;
 
 struct Cliente
 {
-    string Nombre;
-    string Dni;
-    string Username;
-    string Clave;
+    char Nombre[20];
+    char Dni[20];
+    char Username[20];
+    char Clave[20];
     double Saldo;
 };
 
@@ -14,13 +14,20 @@ const int clientesMax = 100;
 Cliente clientes[clientesMax];
 int numClientes = 0;
 
-bool clienteExiste(string &Dni, string &Username)
+bool clienteExiste(char *Dni, char *Username)
 {
     for (int i = 0; i < numClientes; i++)
     {
-        if (clientes[i].Dni == Dni || clientes[i].Username == Username)
+        for (int j = 0; j < 20; j++)
         {
-            return true;
+            if (clientes[i].Dni[j] != Dni[j] || clientes[i].Username[j] != Username[j])
+            {
+                break;
+            }
+            if (j == 19 && clientes[i].Dni[j] == Dni[j] || clientes[i].Username[j] == Username[j])
+            {
+                return true;
+            }
         }
     }
     return false;
@@ -31,19 +38,19 @@ void registrarCliente()
     Cliente clienteNuevo;
 
     cout << "ingrese su nombre" << endl;
-    cin.ignore();
-    getline(cin, clienteNuevo.Nombre);
+    cin >> clienteNuevo.Nombre;
     cout << "ingrese su Dni" << endl;
-    getline(cin, clienteNuevo.Dni);
+    cin >> clienteNuevo.Dni;
     cout << "ingrese su Username" << endl;
-    getline(cin, clienteNuevo.Username);
+    cin >> clienteNuevo.Username;
     cout << "ingrese su Clave" << endl;
-    getline(cin, clienteNuevo.Clave);
+    cin >> clienteNuevo.Clave;
     clienteNuevo.Saldo = 10000.0;
 
     if (clienteExiste(clienteNuevo.Dni, clienteNuevo.Username))
     {
         cout << "Ya existe un cliente con este Dni y Username. Intente con otro." << endl;
+        return;
     }
 
     clientes[numClientes++] = clienteNuevo;
