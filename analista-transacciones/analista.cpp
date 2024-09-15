@@ -12,16 +12,9 @@ En el sistema debo poder:
 1. Listar las transacciones de un cliente ordenadas por fecha con paginas de a 5 transacciones mostrando id, fecha y monto. (LISTO)
 2. Listar la cantidad de ingresos y egresos por mes de un cliente. (POR MES, NO SOLO POR MES VIGENTE). (LISTO)
 3. Mostrar el username del cliente, la fecha y monto de la transacción de monto máximo de todos los clientes. (LISTO PERO HAY QUE PREGUNTAR PARA CLARIFICAR)
-4. Mostrar el cliente que más ingresos tuvo en los últimos 30 días.
+4. Mostrar el cliente que más ingresos tuvo en los últimos 30 días. (LISTO)
 
 */
-
-const int MAXIMO_TRANSACCIONES_PERMITIDAS = 3;
-
-struct ContabilizarIngresosCliente {
-    string username;
-    float cantidad;
-};
 
 struct Mes {
     int ingresos;
@@ -43,6 +36,11 @@ struct TransaccionesEnMes {
     Mes diciembre;
 };
 
+struct ClienteIngresos {
+    char username[20];
+    int ingresos;
+};
+
 struct Transaccion{
     int id;
     int monto;
@@ -50,13 +48,6 @@ struct Transaccion{
     bool esEgreso;
     char username[20];
 };
-
-struct UserConTransacciones {
-    string username;
-    Transaccion ts[MAXIMO_TRANSACCIONES_PERMITIDAS];
-};
-
-// ? refactor
 
 void inicializar_transacciones();
 void leer_transacciones();
@@ -68,52 +59,53 @@ void ordenar_transacciones_por_fecha();
 void ingresos_egresos_cliente();
 void transaccion_mas_alta();
 void cantidad_ultimos_30_dias();
-
-// ! old methods:
-
-void ciclar_transaccion(UserConTransacciones us, Transaccion t);
-void guardar_user_con_transacciones(UserConTransacciones us);
-void leer_user_con_transacciones(UserConTransacciones us[], int& len);
-void ordenar_transacciones(UserConTransacciones us);
-void listar_transacciones(UserConTransacciones& us);
-UserConTransacciones encontrar_cliente_por_username(string username, UserConTransacciones us[], int len);
-Transaccion dame_transaccion_mas_cara(Transaccion t[], int len);
-int obtener_mes_fecha(int fecha);
-TransaccionesEnMes listar_ingresos_egresos_cliente(UserConTransacciones us);
-void listar_transacciones_mas_altas_clientes(UserConTransacciones us[], int len);
 bool fue_ultimos_30_dias(int fecha);
-ContabilizarIngresosCliente mostrar_cliente_mas_ingresos(UserConTransacciones us[], int len);
+int obtener_mes_fecha(int fecha);
 
 int main() {
-    cout << "Queres generar data nueva de prueba?" << endl;
-    cout << "0 = NO | 1 = SI" << endl;
-    int respuesta;
-    cin >> respuesta;
+    bool continuar = true;
+    
+    while(continuar) {
+        int accion;
+        cout << endl << endl;
+        cout << "----- TP AyED 2024 -----" << endl;
+        cout << "Que accion desea realizar?" << endl << endl;
+        cout << "*[0]* Crear Transacciones de Prueba" << endl;
+        cout << "*[1]* Ver todas las transacciones " << endl;
+        cout << "*[2]* Listar Transacciones de un usuario " << endl;
+        cout << "*[3]* Ver ingresos y egresos de un cliente " << endl;
+        cout << "*[4]* Ver transaccion mas alta " << endl;
+        cout << "*[5]* Ver clientes con mas ingresos en los ulitmos 30 dias " << endl;
+        cout << "*[Otro]* Salir " << endl;
+        cout << "-----";
+        cout << endl << endl;
 
-    if(respuesta == 1) {
-        inicializar_transacciones();
-        ordenar_transacciones_por_fecha();
-    }
-
-    cout << "Queres leer las transacciones?" << endl;
-    cout << "0 = NO | 1 = SI" << endl;
-    cin >> respuesta;
-    if(respuesta == 1) {
-        leer_transacciones();
-    }
-
-    cout << "Que queres hacer ahora?" << endl;
-    cout << "1: Listar Transacciones " << endl;
-    cout << "2: Ver ingresos y egresos de un cliente " << endl;
-    cout << "3: Ver transaccion mas alta " << endl;
-    cout << "4: Ver clientes con mas ingresos en los ulitmos 30 dias " << endl;
-    cin >> respuesta;
-
-    switch(respuesta) {
-        case 1: listar_transacciones_archivos();
-        case 2: ingresos_egresos_cliente();
-        case 3: transaccion_mas_alta();
-        case 4: cantidad_ultimos_30_dias();
+        cin >> accion;
+        switch(accion) {
+            case 0:
+                inicializar_transacciones();
+                ordenar_transacciones_por_fecha();
+                break;
+            case 1: 
+                leer_transacciones();
+                break;
+            case 2: 
+                listar_transacciones_archivos();
+                break;
+            case 3: 
+                ingresos_egresos_cliente();
+                break;
+            case 4: 
+                transaccion_mas_alta();
+                break;
+            case 5: 
+                cantidad_ultimos_30_dias();
+                break;
+            default: 
+                cout << "Saliendo del sistema. Gracias" << endl;
+                continuar = false;
+                break;
+        }
     }
 
     return 0;
@@ -121,19 +113,56 @@ int main() {
 
 void cantidad_ultimos_30_dias() {
     FILE* archivo_transacciones = fopen("./data/transacciones.bin", "rb");
-    Transaccion transaccion;
+    FILE* archivo_ingresos = fopen("./data/ingresos_clientes.bin", "wb+");
 
-    if (archivo_transacciones == NULL) {
-        cout << "Error al abrir el archivo de transacciones." << endl;
+    if (archivo_transacciones == NULL || archivo_ingresos == NULL) {
+        cout << "Error abriendo los archivos." << endl;
         return;
     }
 
-    while(fread(&transaccion, sizeof(Transaccion), 1, archivo_transacciones) == 1) {
-        // TODO: Manejar logica
-        cout << transaccion.id;
+    Transaccion transaccion;
+    ClienteIngresos clienteIngreso;
+    ClienteIngresos clienteMaxIngreso = {"", -1};
+
+    while (fread(&transaccion, sizeof(Transaccion), 1, archivo_transacciones) == 1) {
+        if (!transaccion.esEgreso && fue_ultimos_30_dias(transaccion.fecha)) {
+            bool cliente_encontrado = false;
+            fseek(archivo_ingresos, 0, SEEK_SET);
+            while (fread(&clienteIngreso, sizeof(ClienteIngresos), 1, archivo_ingresos) == 1) {
+                if (strcmp(clienteIngreso.username, transaccion.username) == 0) {
+                    cliente_encontrado = true;
+                    clienteIngreso.ingresos += transaccion.monto;
+
+                    fseek(archivo_ingresos, -sizeof(ClienteIngresos), SEEK_CUR);
+                    fwrite(&clienteIngreso, sizeof(ClienteIngresos), 1, archivo_ingresos);
+                    break;
+                }
+            }
+
+            if (!cliente_encontrado) {
+                strcpy(clienteIngreso.username, transaccion.username);
+                clienteIngreso.ingresos = transaccion.monto;
+                fwrite(&clienteIngreso, sizeof(ClienteIngresos), 1, archivo_ingresos);
+            }
+        }
+    }
+
+    fseek(archivo_ingresos, 0, SEEK_SET);
+    while (fread(&clienteIngreso, sizeof(ClienteIngresos), 1, archivo_ingresos) == 1) {
+        if (clienteIngreso.ingresos > clienteMaxIngreso.ingresos) {
+            clienteMaxIngreso = clienteIngreso;
+        }
+    }
+
+    if(clienteMaxIngreso.ingresos == -1) {
+        cout << "No se ha podido encontrar informacion del usuario." << endl;
+    } else {
+        cout << "Cliente con más ingresos en los últimos 30 días: " << clienteMaxIngreso.username << endl;
+        cout << "Ingresos totales: " << clienteMaxIngreso.ingresos << endl;
     }
 
     fclose(archivo_transacciones);
+    fclose(archivo_ingresos);
 }
 
 void transaccion_mas_alta() {
@@ -364,10 +393,10 @@ void inicializar_transacciones() {
         {5, 2, 20240818, false, "Esteban"},
         {10, 18, 20210330, false, "Pepito"},
         {9, 12, 20221230, true, "Pepito"},
-        {6, 300, 20240919, true, "Esteban"},
+        {6, 300, 20240911, false, "Esteban"},
         {8, 9, 20231130, false, "Manolo"},
         {1, 20, 20240431, true, "Pepito"},
-        {7, 8000, 20281020, false, "Manolo"},
+        {7, 8000, 20201020, false, "Manolo"},
         {11, 48, 20140531, true, "Pepito"},
         {12, 11, 20040431, false, "Pepito"},
         {13, 12, 20030431, false, "Pepito"},
@@ -387,223 +416,12 @@ void inicializar_transacciones() {
     return;
 }
 
-//! -- viejo
-
 int obtener_mes_fecha(int fecha) {
     return (fecha / 100) % 100;
 }
 
-TransaccionesEnMes listar_ingresos_egresos_cliente(UserConTransacciones us) {
-    // vamos a suponer que solo hay transacciones anuales (o sea, no hay una en enero 2023 y otra en enero 2024)
-    TransaccionesEnMes transacciones;
-    int transacciones_len = sizeof(us.ts) / sizeof(us.ts[0]);
-
-    for(int i = 0; i < transacciones_len; i++) {
-        switch(obtener_mes_fecha(us.ts[i].fecha)) {
-            case 1: {
-                if(us.ts[i].esEgreso) {
-                    transacciones.enero.egresos += us.ts[i].monto;
-                } else {
-                    transacciones.enero.ingresos += us.ts[i].monto;
-                }
-                break;
-            }
-            case 2: {
-                if(us.ts[i].esEgreso) {
-                    transacciones.febrero.egresos += us.ts[i].monto;
-                } else {
-                    transacciones.febrero.ingresos += us.ts[i].monto;
-                }
-                break;
-            }
-            case 3: {
-                if(us.ts[i].esEgreso) {
-                    transacciones.marzo.egresos += us.ts[i].monto;
-                } else {
-                    transacciones.marzo.ingresos += us.ts[i].monto;
-                }
-                break;
-            }
-            case 4: {
-                if(us.ts[i].esEgreso) {
-                    transacciones.abril.egresos += us.ts[i].monto;
-                } else {
-                    transacciones.abril.ingresos += us.ts[i].monto;
-                }
-                break;
-            }
-            case 5: {
-                if(us.ts[i].esEgreso) {
-                    transacciones.mayo.egresos += us.ts[i].monto;
-                } else {
-                    transacciones.mayo.ingresos += us.ts[i].monto;
-                }
-                break;
-            }
-            case 6: {
-                if(us.ts[i].esEgreso) {
-                    transacciones.junio.egresos += us.ts[i].monto;
-                } else {
-                    transacciones.junio.ingresos += us.ts[i].monto;
-                }
-                break;
-            }
-            case 7: {
-                if(us.ts[i].esEgreso) {
-                    transacciones.julio.egresos += us.ts[i].monto;
-                } else {
-                    transacciones.julio.ingresos += us.ts[i].monto;
-                }
-                break;
-            }
-            case 8: {
-                if(us.ts[i].esEgreso) {
-                    transacciones.agosto.egresos += us.ts[i].monto;
-                } else {
-                    transacciones.agosto.ingresos += us.ts[i].monto;
-                }
-                break;
-            }
-            case 9: {
-                if(us.ts[i].esEgreso) {
-                    transacciones.septiembre.egresos += us.ts[i].monto;
-                } else {
-                    transacciones.septiembre.ingresos += us.ts[i].monto;
-                }
-                break;
-            }
-            case 10: {
-                if(us.ts[i].esEgreso) {
-                    transacciones.octubre.egresos += us.ts[i].monto;
-                } else {
-                    transacciones.octubre.ingresos += us.ts[i].monto;
-                }
-                break;
-            }
-            case 11: {
-                if(us.ts[i].esEgreso) {
-                    transacciones.noviembre.egresos += us.ts[i].monto;
-                } else {
-                    transacciones.noviembre.ingresos += us.ts[i].monto;
-                }
-                break;
-            }
-            case 12: {
-                if(us.ts[i].esEgreso) {
-                    transacciones.diciembre.egresos += us.ts[i].monto;
-                } else {
-                    transacciones.diciembre.ingresos += us.ts[i].monto;
-                }
-                break;
-            }
-        }
-    }
-    
-    return transacciones;
-}
-
-void ciclar_transaccion(UserConTransacciones us, Transaccion t) {
-    int transacciones_len = sizeof(us.ts) / sizeof(us.ts[0]);
-
-    for(int i = 1; i < transacciones_len; i++) {
-        us.ts[i - 1] = us.ts[i];
-    }
-
-    us.ts[transacciones_len - 1] = t;
-
-    guardar_user_con_transacciones(us);
-}
-
-void leer_user_con_transacciones(UserConTransacciones us[], int& len) {
-    FILE* archivo_transacciones = fopen("./generador-transacciones/transacciones.bin", "rb");
-    UserConTransacciones transacciones[MAXIMO_TRANSACCIONES_PERMITIDAS];
-
-    fread(&transacciones, sizeof(UserConTransacciones), MAXIMO_TRANSACCIONES_PERMITIDAS, archivo_transacciones);
-
-    fclose(archivo_transacciones);
-
-    for(int i = 0; i < len; i ++) {
-        us[i] = transacciones[i];
-
-        int transaccionesLen = sizeof(us[i].ts) / sizeof(us[i].ts[0]);
-
-        cout << "Username: " << us[i].username << endl;
-        cout << "Transacciones: " << endl;
-        for(int j = 0; j < transaccionesLen; j++) {
-            cout << "Id de Transaccion: " << us[i].ts[j].id << endl;
-            cout << "Fecha de Transaccion: " << us[i].ts[j].fecha << endl;
-            cout << "Monto de Transaccion: " << us[i].ts[j].monto << endl;
-            cout << "Es egreso la Transaccion: " << us[i].ts[j].esEgreso << endl;
-        }
-        cout << "-----------------" << endl;
-    }
-}
-
-void guardar_user_con_transacciones(UserConTransacciones us) {
-    FILE* archivo_transacciones = fopen("./generador-transacciones/transacciones.bin", "ab");
-
-    fwrite(&us, sizeof(UserConTransacciones), 1, archivo_transacciones);
-
-    fclose(archivo_transacciones);
-}
-
-bool compararFecha(const Transaccion& a, const Transaccion& b) {
-    return a.fecha > b.fecha;
-}
-
-void ordenar_transacciones(UserConTransacciones us) {
-    sort(begin(us.ts), end(us.ts), compararFecha);
-}
-
-void listar_transacciones(UserConTransacciones& us) {
-    ordenar_transacciones(us);
-    int pagina = 1;
-    int transacciones_len = sizeof(us.ts) / sizeof(us.ts[0]);
-    int transacciones_por_pagina = 5;
-
-    for (int i = 0; i < transacciones_len; i += transacciones_por_pagina) {
-        if(i == 0) {
-            cout << "-----------------------" << endl;
-        }
-        cout << "ESTA ES LA PAGINA: " << pagina << endl << endl;
-
-        for (int j = i; j < i + transacciones_por_pagina && j < transacciones_len; ++j) {
-            cout << "Id de Transaccion: " << us.ts[j].id << endl;
-            cout << "Fecha de Transaccion: " << us.ts[j].fecha << endl;
-            cout << "Monto de Transaccion: " << us.ts[j].monto << endl;
-            cout << endl;
-        }
-
-        pagina++;
-        cout << "-----------------------" << endl;
-    }
-}
-
-void listar_transacciones_mas_altas_clientes(UserConTransacciones us[], int len) {
-    for(int i = 0; i < len; ++i) {
-        cout << "EL USERNAME: " << us[i].username << endl;
-        int transferenciaLen = sizeof(us[i].ts) / sizeof(us[i].ts[0]);
-
-        Transaccion mas_cara = dame_transaccion_mas_cara(us[i].ts, transferenciaLen);
-
-        cout << "La mas cara de " << us[i].username << " " <<  "es de: " << mas_cara.monto << " y tiene fecha de: " << mas_cara.fecha << endl;
-    }
-}
-
-Transaccion dame_transaccion_mas_cara(Transaccion t[], int len) {
-    Transaccion mas_cara = t[0];
-    
-    for(int i = 1; i < len; i++)  {
-        if(t[i].monto > mas_cara.monto) {
-            mas_cara = t[i];
-        }
-    }
-
-    return mas_cara;
-}
-
 bool fue_ultimos_30_dias(int fecha) {
-    int fecha_actual = 20240812;
+    int fecha_actual = 20240915;
     
     int anio_actual = fecha_actual / 10000;
     int mes_actual = (fecha_actual / 100) % 100;
@@ -619,45 +437,4 @@ bool fue_ultimos_30_dias(int fecha) {
     int diferencia_dias = dias_actual - dias_fecha;
 
     return diferencia_dias <= 30 && diferencia_dias >= 0;
-}
-
-UserConTransacciones encontrar_cliente_por_username(string username, UserConTransacciones us[], int len) {
-    int i = 0;
-    
-    while(i < len && us[i].username != username) {
-        i++;
-    }
-
-    if(i == len) {
-        cout << "Usuario no encontrado" << endl;
-    }
-
-    return us[i];
-}
-
-ContabilizarIngresosCliente mostrar_cliente_mas_ingresos(UserConTransacciones us[], int len) {
-    ContabilizarIngresosCliente ingresos_clientes[len];
-
-    for(int i = 0; i < len; i++) {
-        ingresos_clientes[i].username = us[i].username;
-        int transferenciaLen = sizeof(us[i].ts) / sizeof(us[i].ts[0]);
-        for(int j = 0; j < 2; j++) {
-            cout << "FUE ULTIMOS 30 DIAS? " << us[i].username << us[i].ts[j].id << fue_ultimos_30_dias(us[i].ts[j].fecha);
-            if(fue_ultimos_30_dias(us[i].ts[j].fecha) && !us[i].ts[j].esEgreso) {
-                ingresos_clientes[i].cantidad += us[i].ts[j].monto;
-            }
-        }
-    }
-
-    int ingresos_clientes_len = sizeof(ingresos_clientes) / sizeof(ingresos_clientes[0]);
-
-    ContabilizarIngresosCliente cliente_con_mas_ingresos = ingresos_clientes[0];
-
-    for(int i = 0; i < ingresos_clientes_len; i++) {
-        if(ingresos_clientes[i].cantidad > cliente_con_mas_ingresos.cantidad) {
-            cliente_con_mas_ingresos = ingresos_clientes[i];
-        }
-    }
-
-    return cliente_con_mas_ingresos;
 }
