@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 using namespace std;
 
 struct Cliente
@@ -18,16 +19,9 @@ bool clienteExiste(char *Dni, char *Username)
 {
     for (int i = 0; i < numClientes; i++)
     {
-        for (int j = 0; j < 20; j++)
+        if (strcmp(clientes[i].Dni, Dni) == 0 && strcmp(clientes[i].Username, Username) == 0)
         {
-            if (clientes[i].Dni[j] != Dni[j] || clientes[i].Username[j] != Username[j])
-            {
-                break;
-            }
-            if (j == 19 && clientes[i].Dni[j] == Dni[j] || clientes[i].Username[j] == Username[j])
-            {
-                return true;
-            }
+            return true;
         }
     }
     return false;
