@@ -4,7 +4,7 @@ using namespace std;
 
 struct Transaccion 
 {
-    int dni;
+    char username[20];
     int id;
     float monto;
     int fecha;
@@ -17,48 +17,36 @@ struct Usuario
     char nombre[20];
     char username[20];
     char password[20];
-    int dni;
+    int dni; 
     float saldo;
 };
 
 
-bool validar_usuario(string nombre_usuario, string contraseña, Usuario& usuario);
+bool validar_usuario(char username[20], char password[20], Usuario& usuario);
 
 bool eliminar_transaccion(int id_transaccion);  
 
-float actualizar_saldo(string username); // deberia hacer que la sumatoria de todos los montos sea positiva
+float actualizar_saldo(char username[20]); 
 
 int sumatoria_tansacciones(Usuario usuario);
 
-void realizar_transaccion(string username);
+void realizar_transaccion(char username[20]);
 
-Transaccion crear_transaccion(int monto, int fecha, bool esEgreso);//falta que asigne el id 
-int obtener_transacciones_usuario(int dni);
 void actualizar_archivo_transacciones();
-
-bool verificar_saldo(string username);
 
 // TODO: Guardar esta nueva TX en un archivo 
 
 // Archivos
-Usuario obtener_usuario(string username);
+Usuario obtener_usuario(char username[20]);
 void agregar_transaccion_archivo(Transaccion transaccion); //insertar ordenado por fecha???????
 int seleccionar_transaccion(Usuario usuario);
 
-/*
-// funcion que duplica el tamaño array
-array duplicarArray(Usuario usuarios[], int len){
-    Usuario nuevoArray[len*2];
-    for(int i=0; i<n; i++){
-        nuevoArray[i] = usuarios[i];
-    }
-    return nuevoArray;
-}*/
+
 
 int main() {
     Usuario usuario;
-    string nombre_usuario;
-    string contraseña;
+    char nombre_usuario[20]="";
+    char passw[20]="";
     char comando = 0;
 
     cout << "Hola!! Bienvenido a SuperBank" << endl;
@@ -67,11 +55,11 @@ int main() {
     cin >> nombre_usuario;
 
     cout << "Contraseña: ";
-    cin >> contraseña;
+    cin >> passw;
 
     cout << "Comprobando las credenciales..." << endl;
     
-    if(!validar_usuario(nombre_usuario, contraseña, usuario))
+    if(!validar_usuario(nombre_usuario, passw, usuario))
     {
         cout << "El usuario no se encontro o la contraseña es incorrecta!!!" << endl;
         return 1;
@@ -112,7 +100,7 @@ int seleccionar_transaccion(Usuario usuario)
 
     while(fread(&transaccion_actual, sizeof(Transaccion), 1, file))
     {
-        if (usuario.dni == transaccion_actual.dni)
+        if (usuario.username == transaccion_actual.username)
             cout << "\nID:" << transaccion_actual.id << "\nMonto:" << transaccion_actual.monto << "\nFecha" << transaccion_actual.fecha << "\nEsEgreso:" << transaccion_actual.esEgreso << "\n------------------" << endl;
     }
 
@@ -122,11 +110,11 @@ int seleccionar_transaccion(Usuario usuario)
     return id;
 }
 
-bool validar_usuario(string nombre_usuario, string contraseña, Usuario& usuario)
+bool validar_usuario(char username[20], char password[20], Usuario& usuario)
 {
-    usuario = obtener_usuario(nombre_usuario);
+    usuario = obtener_usuario(username);
     
-    if(usuario.password != contraseña)
+    if(usuario.password != password)
         return false;
 
     return true;
@@ -157,7 +145,7 @@ obtener_usuario(string, int) -> Usuario
     NO -> devuelve usuario nulo (todo cero)
 IMPORTANTE: Si no se puede abrir el archivo devuelve usuario nulo con la variable errcode = 1
 */
-Usuario obtener_usuario(string username)
+Usuario obtener_usuario(char username[20])
 {
     FILE* file = fopen("./data/usuarios.bin", "rb");
     Usuario user;
@@ -179,7 +167,7 @@ Usuario obtener_usuario(string username)
     }
     fclose(file);
 
-    return {"", "", "", 0, 0.0f}; 
+    return {"N/A", "N/A", "N/A", 0, 0.0}; 
 }
 
 
@@ -237,13 +225,7 @@ bool eliminar_transaccion(int id_transaccion)
     fclose(archivoTemporal);
     
     actualizar_archivo_transacciones();
-    // Reemplazar el archivo original con el archivo temporal
-   /*  esto funciona si utilizamos  #include <cstdio>
-    remove("transacciones.bin");
-    rename("temp.bin", "transacciones.bin");
-    */
 
-    //Al no poder reemplazar y eliminar 1 archivo el nuevo "transacciones" seria el 'temp.bin' 
     cout << "Se elimino la transaccion correctamente" << endl; 
     return true; 
 }
@@ -280,19 +262,10 @@ void actualizar_archivo_transacciones()
 
 
 
-// ::Funciones::
-//va tener que estar relacionado con como agarramos las transacciones
-/*int obtener_ultimo_id(string username){
-    Usuario user= obtener_usuario(username);
-    //no c como seguir :( 
-    return 0;
-
-}*/
-
-Transaccion crear_transaccion(int dni,int monto, int fecha, bool esEgreso){
+Transaccion crear_transaccion(char username[20],int monto, int fecha, bool esEgreso){
     
     Transaccion transaccion;
-    transaccion.dni = dni;
+    transaccion.username = username;
     transaccion.id = obtener_transaccion_id();
     transaccion.monto = monto;
     transaccion.fecha = fecha;
@@ -326,7 +299,7 @@ Transaccion crear_transaccion(int dni,int monto, int fecha, bool esEgreso){
 // b) creo una funcion que reciba la transaccion creada y de ahi lo agregue
 
 
-void realizar_transaccion(string username)
+void realizar_transaccion(char username[20])
 {
     int comandotemp;
     cout << "Que tipo de transaccion quiere realizar:\n0.Salir\n1. Realizar Ingreso\n2.Realizar Egreso\n * \r" << endl;
@@ -353,7 +326,7 @@ void realizar_transaccion(string username)
     cout << "Ahora ingrese la fecha actual \n con el formato DDMMAAAA ejemplo 11092001" << endl;
     cin >> fechatemp;
 
-    agregar_transaccion_archivo(crear_transaccion(user.dni,montotemp, fechatemp, esEgresotemp));
+    agregar_transaccion_archivo(crear_transaccion(user.username,montotemp, fechatemp, esEgresotemp));
 }
 
 
@@ -368,7 +341,7 @@ Actualizar saldo
     sino es suficiente devolver -1
 */
 
-float actualizar_saldo(string username){
+float actualizar_saldo(char username[20]){
 
         Usuario user = obtener_usuario(username);
 
@@ -408,10 +381,10 @@ int sumatoria_tansacciones(Usuario usuario)
 
     while (fread(&transaccion, sizeof(transaccion), 1, file))
     {
-       if(transaccion.esEgreso && transaccion.dni == usuario.dni)
+       if(transaccion.esEgreso && transaccion.username == usuario.username)
             SaldoEstimado -= transaccion.monto;
         
-        if(transaccion.esEgreso==false && transaccion.dni == usuario.dni)
+        if(transaccion.esEgreso==false && transaccion.username == usuario.username)
             SaldoEstimado += transaccion.monto;
     }
 
