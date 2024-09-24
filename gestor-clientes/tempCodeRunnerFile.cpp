@@ -1,1 +1,1 @@
- cin.ignore()
+ fclose(archivo);

@@ -1,33 +1,47 @@
 #include <iostream>
-#include <cstring>
 using namespace std;
 
 struct Cliente
 {
     char Nombre[20];
-    char Dni[20];
+    char Dni[8];
     char Username[20];
     char Clave[20];
     double Saldo;
 };
 
-const int clientesMax = 100;
-Cliente clientes[clientesMax];
-int numClientes = 0;
-
-bool clienteExiste(char *Dni, char *Username)
+bool cadenasIguales(char string1[], char string2[], int len)
 {
-    for (int i = 0; i < numClientes; i++)
+    for (int i = 0; i < len; i++)
     {
-        if (strcmp(clientes[i].Dni, Dni) == 0 && strcmp(clientes[i].Username, Username) == 0)
+        if (string1[i] != string2[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool clienteExiste(FILE *archivo, Cliente unCliente)
+{
+    fseek(archivo, 0, SEEK_SET);
+    Cliente clienteLeido;
+    fread(&clienteLeido, sizeof(Cliente), 1, archivo);
+    while (!feof(archivo))
+    {
+        if (cadenasIguales(clienteLeido.Dni, unCliente.Dni, 8))
         {
             return true;
         }
+        if (cadenasIguales(clienteLeido.Username, unCliente.Username, 20))
+        {
+            return true;
+        }
+        fread(&clienteLeido, sizeof(Cliente), 1, archivo);
     }
     return false;
 }
-
-void registrarCliente()
+Cliente pedirCliente()
 {
     Cliente clienteNuevo;
 
@@ -41,56 +55,26 @@ void registrarCliente()
     cin >> clienteNuevo.Clave;
     clienteNuevo.Saldo = 10000.0;
 
-    if (clienteExiste(clienteNuevo.Dni, clienteNuevo.Username))
-    {
-        cout << "Ya existe un cliente con este Dni y Username. Intente con otro." << endl;
-        return;
-    }
-
-    clientes[numClientes++] = clienteNuevo;
-
-    cout << "Se registro existosamente." << endl;
-
-    return;
+    return clienteNuevo;
 }
 
-void guardarCliente()
+void registrarCliente(FILE *archivo, Cliente clienteNuevo)
 {
-    FILE *archivo = fopen("usuarios.bin", "wb");
-    if (archivo == NULL)
-    {
-        cout << "No se pudo abrir el archivo" << endl;
-        return;
-    }
-
-    fwrite(&numClientes, sizeof(int), 1, archivo);
-    fwrite(clientes, sizeof(Cliente), numClientes, archivo);
-
-    fclose(archivo);
-    return;
-}
-
-void cargarClientes()
-{
-    FILE *archivo = fopen("usuarios.bin", "rb");
-    if (archivo == NULL)
-    {
-        cout << "No se pudo abrir el archivo" << endl;
-        return;
-    }
-
-    fread(&numClientes, sizeof(int), 1, archivo);
-    fread(clientes, sizeof(Cliente), numClientes, archivo);
-
-    fclose(archivo);
-    return;
+    fseek(archivo, sizeof(Cliente), SEEK_END);
+    fwrite(&clienteNuevo, sizeof(Cliente), 1, archivo);
 }
 
 int main()
 {
-    cargarClientes();
+    FILE *archivo = fopen("usuarios.bin", "rb+");
+    if (archivo == NULL)
+    {
+        cout << "No se pudo abrir el archivo" << endl;
+        return 1;
+    }
 
     int opcion;
+    Cliente clienteNuevo;
 
     do
     {
@@ -106,10 +90,18 @@ int main()
         switch (opcion)
         {
         case 1:
-            registrarCliente();
+            clienteNuevo = pedirCliente();
+            if (clienteExiste(archivo, clienteNuevo))
+            {
+                cout << "El cliente ya existe, intente otra vez" << endl;
+            }
+            else
+            {
+                registrarCliente(archivo, clienteNuevo);
+                cout << "se registró existosamente!" << endl;
+            }
             break;
         case 2:
-            guardarCliente();
             cout << "Saliendo del sistema" << endl;
             break;
 
@@ -118,6 +110,8 @@ int main()
             break;
         }
     } while (opcion != 2);
+
+    fclose(archivo);
 
     return 0;
 }
