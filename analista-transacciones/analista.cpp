@@ -1,20 +1,6 @@
 #include <iostream>
+
 using namespace std;
-
-/*
-
-### **Analista de transacciones**
-
-El banco debe poder gestionar las transacciones que realizan los clientes. Cada transacción tiene un monto, una fecha y un id único por cada transacción.
-
-En el sistema debo poder:
-
-1. Listar las transacciones de un cliente ordenadas por fecha con paginas de a 5 transacciones mostrando id, fecha y monto. (LISTO)
-2. Listar la cantidad de ingresos y egresos por mes de un cliente. (POR MES, NO SOLO POR MES VIGENTE). (LISTO)
-3. Mostrar el username del cliente, la fecha y monto de la transacción de monto máximo de todos los clientes. (LISTO PERO HAY QUE PREGUNTAR PARA CLARIFICAR)
-4. Mostrar el cliente que más ingresos tuvo en los últimos 30 días. (LISTO)
-
-*/
 
 struct Mes {
     int ingresos;
@@ -302,18 +288,24 @@ void ordenar_transacciones_por_fecha() {
     int totalTransacciones = contar_transacciones(archivo);
 
     for (int i = 0; i < totalTransacciones - 1; ++i) {
-        for (int j = 0; j < totalTransacciones - i - 1; ++j) {
+        int indiceMinimo = i;
+
+        for (int j = i + 1; j < totalTransacciones; ++j) {
             Transaccion transaccion1, transaccion2;
 
-            fseek(archivo, j * sizeof(Transaccion), SEEK_SET);
+            fseek(archivo, indiceMinimo * sizeof(Transaccion), SEEK_SET);
             fread(&transaccion1, sizeof(Transaccion), 1, archivo);
 
-            fseek(archivo, (j + 1) * sizeof(Transaccion), SEEK_SET);
+            fseek(archivo, j * sizeof(Transaccion), SEEK_SET);
             fread(&transaccion2, sizeof(Transaccion), 1, archivo);
 
-            if (transaccion1.fecha > transaccion2.fecha) {
-                intercambiar_transacciones(archivo, j, j + 1);
+            if (transaccion2.fecha < transaccion1.fecha) {
+                indiceMinimo = j;
             }
+        }
+
+        if (indiceMinimo != i) {
+            intercambiar_transacciones(archivo, i, indiceMinimo);
         }
     }
 
