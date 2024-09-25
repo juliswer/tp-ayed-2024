@@ -5,7 +5,7 @@ using namespace std;
 
 struct Transaccion 
 {
-    char username[20];
+    char username[20] = "";
     int id;
     float monto;
     int fecha;
@@ -15,10 +15,10 @@ struct Transaccion
 
 struct Usuario 
 {
-    char nombre[20];
-    char dni[8];
-    char username[20];
-    char password[20];
+    char nombre[20] = "";
+    char dni[8] = "";
+    char username[20] = "";
+    char password[20] = "";
     float saldo;
 };
 
@@ -27,11 +27,11 @@ bool validar_usuario(string username, string password, Usuario& usuario);
 
 bool eliminar_transaccion(int id_transaccion);  
 
-float actualizar_saldo(char username[20]); 
+float actualizar_saldo(string username); 
 
 int sumatoria_tansacciones(Usuario usuario);
 
-void realizar_transaccion(char username[20]);
+void realizar_transaccion(string username);
 
 void actualizar_archivo_transacciones();
 
@@ -202,7 +202,7 @@ bool eliminar_transaccion(int id_transaccion)
         return false;
     }
 
-    FILE* archivoTemporal = fopen("transacciones_temp.bin", "wb");
+    FILE* archivoTemporal = fopen("./data/transacciones_temp.bin", "wb");
     if (!archivoTemporal) 
     {
         cout << "No se pudo abrir el archivo temporal para escritura." << endl;
@@ -239,7 +239,7 @@ void actualizar_archivo_transacciones()
         return;
     }
 
-    FILE* archivoTemporal = fopen("transacciones_temp.bin", "rb");
+    FILE* archivoTemporal = fopen("./data/transacciones_temp.bin", "rb");
     if (!archivoTemporal) 
     {
         cout << "No se pudo abrir el archivo temporal para escritura." << endl;
@@ -259,35 +259,14 @@ void actualizar_archivo_transacciones()
 
 }
 
-
-
-
-Transaccion crear_transaccion(char username[20],int monto, int fecha, bool esEgreso){
+Transaccion crear_transaccion(string username,int monto, int fecha, bool esEgreso){
     
     Transaccion transaccion;
-    strcpy(transaccion.username, username); 
+    strcpy(transaccion.username, username.c_str()); 
     transaccion.id = obtener_transaccion_id();
     transaccion.monto = monto;
     transaccion.fecha = fecha;
     transaccion.esEgreso = esEgreso;
-    //op a
-/*
-    FILE* file = fopen("transacciones.bin", "ab+");
-    if (file == 0)
-    {
-        cout << "Ha ocurrido un error grave a la hora de cargar la transferencia al sistema \nsaliendo del programa..." << std::endl;
-        exit(1);
-    }
-
-    fwrite(&transaccion, sizeof(Transaccion), 1, file);
-     
-    fclose(file);
-    
-    cout << "Transaccion agregada correctamente.\n" << std::endl;
-
-
-
-*/
 
     return transaccion; 
 
@@ -299,7 +278,7 @@ Transaccion crear_transaccion(char username[20],int monto, int fecha, bool esEgr
 // b) creo una funcion que reciba la transaccion creada y de ahi lo agregue
 
 
-void realizar_transaccion(char username[20])
+void realizar_transaccion(string username)
 {
     int comandotemp;
     cout << "Que tipo de transaccion quiere realizar:\n0.Salir\n1. Realizar Ingreso\n2.Realizar Egreso\n * \r" << endl;
@@ -341,29 +320,26 @@ Actualizar saldo
     sino es suficiente devolver -1
 */
 
-float actualizar_saldo(char username[20]){
+float actualizar_saldo(string username){
 
-        Usuario user = obtener_usuario(username);
+    Usuario user = obtener_usuario(username);
 
-        if(sumatoria_tansacciones(user) + user.saldo >=0)
-        {
+    if(sumatoria_tansacciones(user) + user.saldo >=0)
+    {
 
-            user.saldo = sumatoria_tansacciones(user) + user.saldo;
-            cout<<"Transaccion realizada con exito";
-            return user.saldo;
+        user.saldo = sumatoria_tansacciones(user) + user.saldo;
+        cout<<"Transaccion realizada con exito";
+        return user.saldo;
 
-        }
+    }
 
-        else
-        {
-            cout<<"No se puede realizar esta accion, saldo insuficiente";
-            return -1;
-        }
+    else
+    {
+        cout<<"No se puede realizar esta accion, saldo insuficiente";
+        return -1;
+    }
         
-}//deberia hacer que la sumatoria de todos los montos sea positiva
-
-
-//cambiar como tomar las transacciones 
+}
 
 
 int sumatoria_tansacciones(Usuario usuario)
@@ -381,10 +357,10 @@ int sumatoria_tansacciones(Usuario usuario)
 
     while (fread(&transaccion, sizeof(transaccion), 1, file))
     {
-       if(transaccion.esEgreso && transaccion.username == usuario.username)
+       if(transaccion.esEgreso && !strcmp(transaccion.username, usuario.username))
             SaldoEstimado -= transaccion.monto;
         
-        if(transaccion.esEgreso==false && transaccion.username == usuario.username)
+        if(transaccion.esEgreso==false && !strcmp(transaccion.username, usuario.username))
             SaldoEstimado += transaccion.monto;
     }
 
