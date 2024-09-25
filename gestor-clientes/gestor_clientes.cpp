@@ -1,13 +1,14 @@
 #include <iostream>
+#include <cstring>
 using namespace std;
 
 struct Cliente
 {
-    char Nombre[20];
-    char Dni[8];
-    char Username[20];
-    char Clave[20];
-    double Saldo;
+    char Nombre[20] = "";
+    char Dni[8] = "";
+    char Username[20] = "";
+    char Clave[20] = "";
+    float Saldo;
 };
 
 bool cadenasIguales(char string1[], char string2[], int len)
@@ -60,13 +61,13 @@ Cliente pedirCliente()
 
 void registrarCliente(FILE *archivo, Cliente clienteNuevo)
 {
-    fseek(archivo, sizeof(Cliente), SEEK_END);
+    //fseek(archivo, sizeof(Cliente), SEEK_END);
     fwrite(&clienteNuevo, sizeof(Cliente), 1, archivo);
 }
 
 int main()
 {
-    FILE *archivo = fopen("usuarios.bin", "rb+");
+    FILE *archivo = fopen("usuarios.bin", "ab+");
     if (archivo == NULL)
     {
         cout << "No se pudo abrir el archivo" << endl;

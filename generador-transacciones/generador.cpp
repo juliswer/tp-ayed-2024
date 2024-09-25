@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 using namespace std;
 
 
@@ -15,14 +16,14 @@ struct Transaccion
 struct Usuario 
 {
     char nombre[20];
+    char dni[8];
     char username[20];
     char password[20];
-    int dni; 
     float saldo;
 };
 
 
-bool validar_usuario(char username[20], char password[20], Usuario& usuario);
+bool validar_usuario(string username, string password, Usuario& usuario);
 
 bool eliminar_transaccion(int id_transaccion);  
 
@@ -34,10 +35,9 @@ void realizar_transaccion(char username[20]);
 
 void actualizar_archivo_transacciones();
 
-// TODO: Guardar esta nueva TX en un archivo 
 
 // Archivos
-Usuario obtener_usuario(char username[20]);
+Usuario obtener_usuario(string username);
 void agregar_transaccion_archivo(Transaccion transaccion); //insertar ordenado por fecha???????
 int seleccionar_transaccion(Usuario usuario);
 
@@ -45,8 +45,8 @@ int seleccionar_transaccion(Usuario usuario);
 
 int main() {
     Usuario usuario;
-    char nombre_usuario[20]="";
-    char passw[20]="";
+    string nombre_usuario;
+    string passw; 
     char comando = 0;
 
     cout << "Hola!! Bienvenido a SuperBank" << endl;
@@ -110,7 +110,7 @@ int seleccionar_transaccion(Usuario usuario)
     return id;
 }
 
-bool validar_usuario(char username[20], char password[20], Usuario& usuario)
+bool validar_usuario(string username, string password, Usuario& usuario)
 {
     usuario = obtener_usuario(username);
     
@@ -129,7 +129,7 @@ void agregar_transaccion_archivo(Transaccion transaccion)
     if (file == 0)
     {
         cout << "Ha ocurrido un error grave a la hora de abrir el archivo \nsaliendo del programa..." << std::endl;
-        exit(1);
+        exit(1); 
     }
 
     fwrite(&transaccion, sizeof(Transaccion), 1, file);
@@ -145,7 +145,7 @@ obtener_usuario(string, int) -> Usuario
     NO -> devuelve usuario nulo (todo cero)
 IMPORTANTE: Si no se puede abrir el archivo devuelve usuario nulo con la variable errcode = 1
 */
-Usuario obtener_usuario(char username[20])
+Usuario obtener_usuario(string username)
 {
     FILE* file = fopen("./data/usuarios.bin", "rb");
     Usuario user;
@@ -156,10 +156,10 @@ Usuario obtener_usuario(char username[20])
         cout << "Ha ocurrido un error grave a la hora de abrir el archivo \nsaliendo del programa..." << std::endl;
         exit(1);
     }
-
+    
     while (fread(&user, sizeof(user), 1, file))
     {
-        if(user.username == username)
+        if(strcmp(user.username, username.c_str()) == 0)
         {
             fclose(file);
             return user;
@@ -167,7 +167,7 @@ Usuario obtener_usuario(char username[20])
     }
     fclose(file);
 
-    return {"N/A", "N/A", "N/A", 0, 0.0}; 
+    return {"N/A", "N/A", "N/A", 0, '0'}; 
 }
 
 
@@ -265,7 +265,7 @@ void actualizar_archivo_transacciones()
 Transaccion crear_transaccion(char username[20],int monto, int fecha, bool esEgreso){
     
     Transaccion transaccion;
-    transaccion.username = username;
+    strcpy(transaccion.username, username); 
     transaccion.id = obtener_transaccion_id();
     transaccion.monto = monto;
     transaccion.fecha = fecha;
