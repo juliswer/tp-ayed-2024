@@ -100,8 +100,8 @@ int seleccionar_transaccion(Usuario usuario)
 
     while(fread(&transaccion_actual, sizeof(Transaccion), 1, file))
     {
-        if (usuario.username == transaccion_actual.username)
-            cout << "\nID:" << transaccion_actual.id << "\nMonto:" << transaccion_actual.monto << "\nFecha" << transaccion_actual.fecha << "\nEsEgreso:" << transaccion_actual.esEgreso << "\n------------------" << endl;
+        if (!strcmp(usuario.username, transaccion_actual.username))
+            cout << "\nID:" << transaccion_actual.id << "\nMonto:" << transaccion_actual.monto << "\nFecha: " << transaccion_actual.fecha << "\nEsEgreso:" << transaccion_actual.esEgreso << "\n------------------" << endl;
     }
 
     fclose(file);
