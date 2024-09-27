@@ -4,11 +4,11 @@ using namespace std;
 
 struct Cliente
 {
-    char Nombre[20] = "";
-    char Dni[8] = "";
-    char Username[20] = "";
-    char Clave[20] = "";
-    float Saldo;
+    char nombre[20] = "";
+    char DNI[8] = "";
+    char username[20] = "";
+    char clave[20] = "";
+    float saldo;
 };
 
 bool cadenasIguales(char string1[], char string2[], int len)
@@ -30,11 +30,11 @@ bool clienteExiste(FILE *archivo, Cliente unCliente)
     fread(&clienteLeido, sizeof(Cliente), 1, archivo);
     while (!feof(archivo))
     {
-        if (cadenasIguales(clienteLeido.Dni, unCliente.Dni, 8))
+        if (cadenasIguales(clienteLeido.DNI, unCliente.DNI, 8))
         {
             return true;
         }
-        if (cadenasIguales(clienteLeido.Username, unCliente.Username, 20))
+        if (cadenasIguales(clienteLeido.username, unCliente.username, 20))
         {
             return true;
         }
@@ -47,14 +47,14 @@ Cliente pedirCliente()
     Cliente clienteNuevo;
 
     cout << "ingrese su nombre" << endl;
-    cin >> clienteNuevo.Nombre;
+    cin >> clienteNuevo.nombre;
     cout << "ingrese su Dni" << endl;
-    cin >> clienteNuevo.Dni;
+    cin >> clienteNuevo.DNI;
     cout << "ingrese su Username" << endl;
-    cin >> clienteNuevo.Username;
+    cin >> clienteNuevo.username;
     cout << "ingrese su Clave" << endl;
-    cin >> clienteNuevo.Clave;
-    clienteNuevo.Saldo = 10000.0;
+    cin >> clienteNuevo.clave;
+    clienteNuevo.saldo = 10000.0;
 
     return clienteNuevo;
 }
@@ -67,7 +67,7 @@ void registrarCliente(FILE *archivo, Cliente clienteNuevo)
 
 int main()
 {
-    FILE *archivo = fopen("usuarios.bin", "ab+");
+    FILE *archivo = fopen("../data/usuarios.bin", "ab+");
     if (archivo == NULL)
     {
         cout << "No se pudo abrir el archivo" << endl;

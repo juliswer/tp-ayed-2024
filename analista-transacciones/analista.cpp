@@ -29,11 +29,11 @@ struct ClienteIngresos {
 };
 
 struct Transaccion{
+    char username[20];
     int id;
-    int monto;
+    float monto;
     int fecha; // * formato AAAAMMDD
     bool esEgreso;
-    char username[20];
 };
 
 void inicializar_transacciones();
@@ -57,7 +57,6 @@ int main() {
         cout << endl << endl;
         cout << "----- TP AyED 2024 -----" << endl;
         cout << "Que accion desea realizar?" << endl << endl;
-        cout << "*[0]* Crear Transacciones de Prueba" << endl;
         cout << "*[1]* Ver todas las transacciones " << endl;
         cout << "*[2]* Listar Transacciones de un usuario " << endl;
         cout << "*[3]* Ver ingresos y egresos de un cliente " << endl;
@@ -68,11 +67,8 @@ int main() {
         cout << endl << endl;
 
         cin >> accion;
+        ordenar_transacciones_por_fecha();
         switch(accion) {
-            case 0:
-                inicializar_transacciones();
-                ordenar_transacciones_por_fecha();
-                break;
             case 1: 
                 leer_transacciones();
                 break;
@@ -99,8 +95,8 @@ int main() {
 }
 
 void cantidad_ultimos_30_dias() {
-    FILE* archivo_transacciones = fopen("./data/transacciones.bin", "rb");
-    FILE* archivo_ingresos = fopen("./data/ingresos_clientes.bin", "wb+");
+    FILE* archivo_transacciones = fopen("../data/transacciones.bin", "rb");
+    FILE* archivo_ingresos = fopen("../data/ingresos_clientes.bin", "wb+");
 
     if (archivo_transacciones == NULL || archivo_ingresos == NULL) {
         cout << "Error abriendo los archivos." << endl;
@@ -153,7 +149,7 @@ void cantidad_ultimos_30_dias() {
 }
 
 void transaccion_mas_alta() {
-    FILE* archivo_transacciones = fopen("./data/transacciones.bin", "rb");
+    FILE* archivo_transacciones = fopen("../data/transacciones.bin", "rb");
     
     if (archivo_transacciones == NULL) {
         cout << "Error al abrir el archivo de transacciones." << endl;
@@ -181,22 +177,22 @@ void transaccion_mas_alta() {
 
 void mostrar_transacciones_en_mes(TransaccionesEnMes transaccionesMes) {
     cout << "\nIngresos y egresos por mes:\n";
-    cout << "Enero: " << transaccionesMes.enero.ingresos << " ingresos, " << transaccionesMes.enero.egresos << " egresos\n";
-    cout << "Febrero: " << transaccionesMes.febrero.ingresos << " ingresos, " << transaccionesMes.febrero.egresos << " egresos\n";
-    cout << "Marzo: " << transaccionesMes.marzo.ingresos << " ingresos, " << transaccionesMes.marzo.egresos << " egresos\n";
-    cout << "Abril: " << transaccionesMes.abril.ingresos << " ingresos, " << transaccionesMes.abril.egresos << " egresos\n";
-    cout << "Mayo: " << transaccionesMes.mayo.ingresos << " ingresos, " << transaccionesMes.mayo.egresos << " egresos\n";
-    cout << "Junio: " << transaccionesMes.junio.ingresos << " ingresos, " << transaccionesMes.junio.egresos << " egresos\n";
-    cout << "Julio: " << transaccionesMes.julio.ingresos << " ingresos, " << transaccionesMes.julio.egresos << " egresos\n";
-    cout << "Agosto: " << transaccionesMes.agosto.ingresos << " ingresos, " << transaccionesMes.agosto.egresos << " egresos\n";
-    cout << "Septiembre: " << transaccionesMes.septiembre.ingresos << " ingresos, " << transaccionesMes.septiembre.egresos << " egresos\n";
-    cout << "Octubre: " << transaccionesMes.octubre.ingresos << " ingresos, " << transaccionesMes.octubre.egresos << " egresos\n";
-    cout << "Noviembre: " << transaccionesMes.noviembre.ingresos << " ingresos, " << transaccionesMes.noviembre.egresos << " egresos\n";
-    cout << "Diciembre: " << transaccionesMes.diciembre.ingresos << " ingresos, " << transaccionesMes.diciembre.egresos << " egresos\n";
+    cout << "Enero: $" << transaccionesMes.enero.ingresos << " ingresos, $" << transaccionesMes.enero.egresos << " egresos\n";
+    cout << "Febrero: $" << transaccionesMes.febrero.ingresos << " ingresos, $" << transaccionesMes.febrero.egresos << " egresos\n";
+    cout << "Marzo: $" << transaccionesMes.marzo.ingresos << " ingresos, $" << transaccionesMes.marzo.egresos << " egresos\n";
+    cout << "Abril: $" << transaccionesMes.abril.ingresos << " ingresos, $" << transaccionesMes.abril.egresos << " egresos\n";
+    cout << "Mayo: $" << transaccionesMes.mayo.ingresos << " ingresos, $" << transaccionesMes.mayo.egresos << " egresos\n";
+    cout << "Junio: $" << transaccionesMes.junio.ingresos << " ingresos, $" << transaccionesMes.junio.egresos << " egresos\n";
+    cout << "Julio: $" << transaccionesMes.julio.ingresos << " ingresos, $" << transaccionesMes.julio.egresos << " egresos\n";
+    cout << "Agosto: $" << transaccionesMes.agosto.ingresos << " ingresos, $" << transaccionesMes.agosto.egresos << " egresos\n";
+    cout << "Septiembre: $" << transaccionesMes.septiembre.ingresos << " ingresos, $" << transaccionesMes.septiembre.egresos << " egresos\n";
+    cout << "Octubre: $" << transaccionesMes.octubre.ingresos << " ingresos, $" << transaccionesMes.octubre.egresos << " egresos\n";
+    cout << "Noviembre: $" << transaccionesMes.noviembre.ingresos << " ingresos, $" << transaccionesMes.noviembre.egresos << " egresos\n";
+    cout << "Diciembre: $" << transaccionesMes.diciembre.ingresos << " ingresos, $" << transaccionesMes.diciembre.egresos << " egresos\n";
 }
 
 void ingresos_egresos_cliente() {
-    FILE* archivo_transacciones = fopen("./data/transacciones.bin", "rb");
+    FILE* archivo_transacciones = fopen("../data/transacciones.bin", "rb");
     if (archivo_transacciones == NULL) {
         cout << "Error al abrir el archivo de transacciones." << endl;
         return;
@@ -280,7 +276,7 @@ int contar_transacciones(FILE* archivo) {
 }
 
 void ordenar_transacciones_por_fecha() {
-    FILE* archivo = fopen("./data/transacciones.bin", "r+b");
+    FILE* archivo = fopen("../data/transacciones.bin", "r+b");
     if (archivo == NULL) {
         cout << "Error al abrir el archivo de transacciones." << endl;
         return;
@@ -314,7 +310,7 @@ void ordenar_transacciones_por_fecha() {
 }
 
 void listar_transacciones_archivos() {
-    FILE* archivo_transacciones = fopen("./data/transacciones.bin", "rb");
+    FILE* archivo_transacciones = fopen("../data/transacciones.bin", "rb");
 
     if (archivo_transacciones == NULL) {
         cout << "Algo salió mal con el puntero del archivo_transacciones" << endl;
@@ -362,7 +358,7 @@ void listar_transacciones_archivos() {
 }
 
 void leer_transacciones() {
-    FILE* archivo_transacciones = fopen("./data/transacciones.bin", "rb");
+    FILE* archivo_transacciones = fopen("../data/transacciones.bin", "rb");
 
     if(archivo_transacciones != NULL) {
         Transaccion transaccion;
@@ -379,32 +375,32 @@ void leer_transacciones() {
 }
 
 void inicializar_transacciones() {
-    Transaccion transacciones[14] = {
-        {4, 1, 20240717, true, "Carlos"},
-        {2, 400, 20240520, false, "Pepito"},
-        {3, 30, 20240610, false, "Carlos"},
-        {5, 2, 20240818, false, "Esteban"},
-        {10, 18, 20210330, false, "Pepito"},
-        {9, 12, 20221230, true, "Pepito"},
-        {6, 300, 20240911, false, "Esteban"},
-        {8, 9, 20231130, false, "Manolo"},
-        {1, 20, 20240431, true, "Pepito"},
-        {7, 8000, 20201020, false, "Manolo"},
-        {11, 48, 20140531, true, "Pepito"},
-        {12, 11, 20040431, false, "Pepito"},
-        {13, 12, 20030431, false, "Pepito"},
-        {14, 3048, 20140431, true, "Pepito"},
-    };
+    // Transaccion transacciones[14] = {
+    //     {4, 1, 20240717, true, "Carlos"},
+    //     {2, 400, 20240520, false, "Pepito"},
+    //     {3, 30, 20240610, false, "Carlos"},
+    //     {5, 2, 20240818, false, "Esteban"},
+    //     {10, 18, 20210330, false, "Pepito"},
+    //     {9, 12, 20221230, true, "Pepito"},
+    //     {6, 300, 20240911, false, "Esteban"},
+    //     {8, 9, 20231130, false, "Manolo"},
+    //     {1, 20, 20240431, true, "Pepito"},
+    //     {7, 8000, 20201020, false, "Manolo"},
+    //     {11, 48, 20140531, true, "Pepito"},
+    //     {12, 11, 20040431, false, "Pepito"},
+    //     {13, 12, 20030431, false, "Pepito"},
+    //     {14, 3048, 20140431, true, "Pepito"},
+    // };
 
-    FILE* archivo_transacciones = fopen("./data/transacciones.bin", "wb");
+    // FILE* archivo_transacciones = fopen("../data/transacciones.bin", "wb");
 
-    if(archivo_transacciones != NULL) {
-        fwrite(transacciones, sizeof(Transaccion), 14, archivo_transacciones);
-    } else {
-        cout << "Algo salio mal con el puntero del archivo_transacciones" << endl;
-    }
+    // if(archivo_transacciones != NULL) {
+    //     fwrite(transacciones, sizeof(Transaccion), 14, archivo_transacciones);
+    // } else {
+    //     cout << "Algo salio mal con el puntero del archivo_transacciones" << endl;
+    // }
 
-    fclose(archivo_transacciones);
+    // fclose(archivo_transacciones);
 
     return;
 }
@@ -414,7 +410,7 @@ int obtener_mes_fecha(int fecha) {
 }
 
 bool fue_ultimos_30_dias(int fecha) {
-    int fecha_actual = 20240915;
+    int fecha_actual = 20241225; // esta fecha debe ser ajustada manualmente
     
     int anio_actual = fecha_actual / 10000;
     int mes_actual = (fecha_actual / 100) % 100;
